@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java 아키텍처 면접 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --accent5: #4cc9f0;
+    --accent6: #c77dff;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 72px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent5) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent3), transparent);
+    opacity: 0.3;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 56px 0;
+  }
+
+  /* ── ARCHITECTURE LAYERS ── */
+  .arch-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 48px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .arch-layer {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+    cursor: default;
+  }
+  .arch-layer:last-child { border-bottom: none; }
+  .arch-layer:hover { background: rgba(255,255,255,0.015); }
+
+  .layer-label {
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    border-right: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    position: relative;
+  }
+
+  .layer-label::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--layer-color);
+  }
+
+  .layer-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--layer-color);
+    opacity: 0.6;
+  }
+
+  .layer-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--layer-color);
+    margin-top: 2px;
+  }
+
+  .layer-kr {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  .layer-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .layer-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .component-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .comp-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid color-mix(in srgb, var(--layer-color) 40%, transparent);
+    color: var(--layer-color);
+    background: color-mix(in srgb, var(--layer-color) 8%, transparent);
+    white-space: nowrap;
+  }
+
+  .comp-chip.dim {
+    border-color: var(--border);
+    color: var(--muted);
+    background: transparent;
+  }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.1s both;
+    overflow-x: auto;
+  }
+
+  .flow-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  .flow-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 700px;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .flow-box {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--fn-color, var(--accent1));
+    background: color-mix(in srgb, var(--fn-color, var(--accent1)) 10%, transparent);
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .flow-box-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .flow-box-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fn-color, var(--accent1));
+    display: block;
+  }
+
+  .flow-box-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    display: block;
+    white-space: nowrap;
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    min-width: 40px;
+  }
+
+  .arrow-line {
+    height: 1.5px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--border), var(--muted), var(--border));
+  }
+
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* ── DESIGN PATTERNS GRID ── */
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .pattern-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .pattern-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--pc-color);
+  }
+
+  .pattern-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--pc-color);
+  }
+
+  .pattern-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .pattern-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--pc-color) 20%, transparent);
+    color: var(--pc-color);
+    border: 1px solid color-mix(in srgb, var(--pc-color) 40%, transparent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .pattern-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pc-color);
+    line-height: 1.2;
+  }
+
+  .pattern-kr {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .pattern-visual {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pattern-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .pattern-usage {
+    padding: 9px 11px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .pattern-usage strong {
+    color: var(--pc-color);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  /* Pattern Visuals */
+  .pv-singleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pv-box {
+    padding: 6px 14px;
+    border: 1.5px solid var(--pc-color);
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--pc-color);
+    background: color-mix(in srgb, var(--pc-color) 10%, transparent);
+  }
+
+  .pv-box.main {
+    background: color-mix(in srgb, var(--pc-color) 25%, transparent);
+    font-weight: 700;
+  }
+
+  .pv-arrow {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .pv-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .pv-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--pc-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--pc-color);
+    background: color-mix(in srgb, var(--pc-color) 10%, transparent);
+  }
+
+  /* ── SPRING BOOT LIFECYCLE ── */
+  .lifecycle-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+
+  .lifecycle-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .lifecycle-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0;
+    position: relative;
+  }
+
+  .lifecycle-steps::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent5), var(--accent6), var(--accent2));
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  .lc-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lc-dot {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--lc-color);
+    background: color-mix(in srgb, var(--lc-color) 15%, var(--card));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .lc-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--lc-color);
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .lc-desc {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ── QA ── */
+  .qa-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+
+  .qa-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .qa-item:hover { border-color: #333350; }
+  .qa-item.open { border-color: var(--accent2); }
+
+  .qa-q {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .qa-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent2) 20%, transparent);
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .qa-chevron {
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform 0.3s ease;
+    font-size: 12px;
+  }
+  .qa-item.open .qa-chevron { transform: rotate(180deg); }
+
+  .qa-a {
+    display: none;
+    padding: 14px 20px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    border-top: 1px solid var(--border);
+  }
+  .qa-item.open .qa-a { display: block; }
+  .qa-a .hl { font-family: 'JetBrains Mono', monospace; color: var(--accent1); font-size: 12px; }
+
+  /* code snippet */
+  .code-block {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #a8b8d8;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .code-block .kw { color: var(--accent5); }
+  .code-block .cl { color: var(--accent3); }
+  .code-block .an { color: var(--accent1); }
+  .code-block .st { color: #a8ff78; }
+  .code-block .cm { color: var(--muted); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  th {
+    background: rgba(0,245,212,0.05);
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent1);
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.018); }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent1); font-weight: 700; }
+
+  .tag-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .mini-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .c1 { color: var(--accent1); }
+  .c2 { color: var(--accent2); }
+  .c3 { color: var(--accent3); }
+  .c5 { color: var(--accent5); }
+  .c6 { color: var(--accent6); }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .pattern-card:nth-child(1) { animation-delay: 0.05s; }
+  .pattern-card:nth-child(2) { animation-delay: 0.10s; }
+  .pattern-card:nth-child(3) { animation-delay: 0.15s; }
+  .pattern-card:nth-child(4) { animation-delay: 0.20s; }
+  .pattern-card:nth-child(5) { animation-delay: 0.25s; }
+  .pattern-card:nth-child(6) { animation-delay: 0.30s; }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 640px) {
+    .arch-layer { grid-template-columns: 100px 1fr; }
+    .pattern-grid { grid-template-columns: 1fr; }
+    .lifecycle-steps { grid-template-columns: repeat(3, 1fr); }
+    .flow-track { min-width: 900px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="label">// INTERVIEW PREP — BACKEND</div>
+    <h1>Java 앱<br>아키텍처</h1>
+    <p class="subtitle">설계 원칙 · 레이어 구조 · 디자인 패턴 · 면접 핵심</p>
+  </header>
+
+  <!-- LAYERED ARCHITECTURE -->
+  <div class="section-title">레이어드 아키텍처 (N-Tier)</div>
+  <div class="arch-wrap">
+
+    <div class="arch-layer" style="--layer-color: #f72585;">
+      <div class="layer-label">
+        <div class="layer-num">01</div>
+        <div class="layer-name">Presentation</div>
+        <div class="layer-kr">프레젠테이션 계층</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-desc">사용자 요청을 받고 응답을 반환. 비즈니스 로직 없이 입력 검증과 포맷 변환만 담당.</div>
+        <div class="component-row">
+          <span class="comp-chip">@RestController</span>
+          <span class="comp-chip">@RequestMapping</span>
+          <span class="comp-chip">@Valid</span>
+          <span class="comp-chip">DTO</span>
+          <span class="comp-chip dim">HTTP Request/Response</span>
+          <span class="comp-chip dim">JSON 직렬화</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-layer" style="--layer-color: #ffd60a;">
+      <div class="layer-label">
+        <div class="layer-num">02</div>
+        <div class="layer-name">Business</div>
+        <div class="layer-kr">비즈니스 계층</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-desc">핵심 비즈니스 로직 처리. 트랜잭션 관리. 계층 간 조정자 역할. 인프라에 의존하지 않음.</div>
+        <div class="component-row">
+          <span class="comp-chip">@Service</span>
+          <span class="comp-chip">@Transactional</span>
+          <span class="comp-chip">UseCase Interface</span>
+          <span class="comp-chip dim">비즈니스 규칙</span>
+          <span class="comp-chip dim">도메인 로직</span>
+          <span class="comp-chip dim">예외 처리</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-layer" style="--layer-color: #00f5d4;">
+      <div class="layer-label">
+        <div class="layer-num">03</div>
+        <div class="layer-name">Persistence</div>
+        <div class="layer-kr">퍼시스턴스 계층</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-desc">데이터 접근 추상화. DB 쿼리, ORM 매핑. Repository 패턴으로 비즈니스 계층에서 DB 분리.</div>
+        <div class="component-row">
+          <span class="comp-chip">@Repository</span>
+          <span class="comp-chip">JpaRepository</span>
+          <span class="comp-chip">@Entity</span>
+          <span class="comp-chip">JPQL</span>
+          <span class="comp-chip dim">ORM 매핑</span>
+          <span class="comp-chip dim">QueryDSL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-layer" style="--layer-color: #4cc9f0;">
+      <div class="layer-label">
+        <div class="layer-num">04</div>
+        <div class="layer-name">Database</div>
+        <div class="layer-kr">데이터베이스 계층</div>
+      </div>
+      <div class="layer-body">
+        <div class="layer-desc">실제 데이터 저장소. 관계형 DB, NoSQL 등. 스키마 설계, 인덱스, 정규화가 핵심.</div>
+        <div class="component-row">
+          <span class="comp-chip">MySQL / PostgreSQL</span>
+          <span class="comp-chip">Redis</span>
+          <span class="comp-chip">MongoDB</span>
+          <span class="comp-chip dim">Connection Pool</span>
+          <span class="comp-chip dim">Index</span>
+          <span class="comp-chip dim">트랜잭션</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REQUEST FLOW -->
+  <div class="section-title">요청 흐름 다이어그램</div>
+  <div class="flow-diagram">
+    <div class="flow-title">// HTTP REQUEST → RESPONSE CYCLE</div>
+    <div class="flow-track">
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #c77dff;">
+          <div class="flow-box-icon">🌐</div>
+          <span class="flow-box-name">Client</span>
+          <span class="flow-box-sub">Browser / App</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">HTTP POST</div>
+      </div>
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #4cc9f0;">
+          <div class="flow-box-icon">🛡</div>
+          <span class="flow-box-name">Filter</span>
+          <span class="flow-box-sub">Security / CORS</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">인증 통과</div>
+      </div>
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #f72585;">
+          <div class="flow-box-icon">🎮</div>
+          <span class="flow-box-name">Controller</span>
+          <span class="flow-box-sub">@RestController</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">DTO 변환</div>
+      </div>
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #ffd60a;">
+          <div class="flow-box-icon">⚙️</div>
+          <span class="flow-box-name">Service</span>
+          <span class="flow-box-sub">@Transactional</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">Repository</div>
+      </div>
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #00f5d4;">
+          <div class="flow-box-icon">🗄️</div>
+          <span class="flow-box-name">DB</span>
+          <span class="flow-box-sub">JPA / SQL</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">Entity 반환</div>
+      </div>
+
+      <div class="flow-node">
+        <div class="flow-box" style="--fn-color: #ff9f1c;">
+          <div class="flow-box-icon">📦</div>
+          <span class="flow-box-name">Response</span>
+          <span class="flow-box-sub">200 OK / JSON</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SPRING LIFECYCLE -->
+  <div class="section-title">Spring Bean 생명주기</div>
+  <div class="lifecycle-wrap">
+    <div class="lifecycle-title">// BEAN LIFECYCLE — IoC 컨테이너가 관리하는 전체 흐름</div>
+    <div class="lifecycle-steps">
+
+      <div class="lc-step" style="--lc-color: #4cc9f0;">
+        <div class="lc-dot">📋</div>
+        <div class="lc-name">설정 로딩</div>
+        <div class="lc-desc">@Configuration<br>@ComponentScan</div>
+      </div>
+
+      <div class="lc-step" style="--lc-color: #7209b7;">
+        <div class="lc-dot">🏭</div>
+        <div class="lc-name">Bean 생성</div>
+        <div class="lc-desc">BeanFactory<br>인스턴스화</div>
+      </div>
+
+      <div class="lc-step" style="--lc-color: #f72585;">
+        <div class="lc-dot">💉</div>
+        <div class="lc-name">의존성 주입</div>
+        <div class="lc-desc">@Autowired<br>생성자 주입</div>
+      </div>
+
+      <div class="lc-step" style="--lc-color: #ffd60a;">
+        <div class="lc-dot">⚡</div>
+        <div class="lc-name">초기화</div>
+        <div class="lc-desc">@PostConstruct<br>afterPropertiesSet</div>
+      </div>
+
+      <div class="lc-step" style="--lc-color: #00f5d4;">
+        <div class="lc-dot">✅</div>
+        <div class="lc-name">사용 준비</div>
+        <div class="lc-desc">ApplicationContext<br>getBean()</div>
+      </div>
+
+      <div class="lc-step" style="--lc-color: #80ffdb;">
+        <div class="lc-dot">🗑</div>
+        <div class="lc-name">소멸</div>
+        <div class="lc-desc">@PreDestroy<br>destroy()</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DESIGN PATTERNS -->
+  <div class="section-title">핵심 디자인 패턴</div>
+  <div class="pattern-grid">
+
+    <!-- Singleton -->
+    <div class="pattern-card" style="--pc-color: #00f5d4;">
+      <div class="pattern-header">
+        <span class="pattern-badge">생성</span>
+        <div>
+          <div class="pattern-name">Singleton</div>
+          <div class="pattern-kr">싱글톤 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div class="pv-row">
+            <div class="pv-circle" style="width:28px;height:28px;font-size:9px;">A</div>
+            <div class="pv-arrow">→</div>
+            <div class="pv-box main">Instance</div>
+            <div class="pv-arrow">←</div>
+            <div class="pv-circle" style="width:28px;height:28px;font-size:9px;">B</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;">같은 인스턴스 공유</div>
+        </div>
+      </div>
+      <div class="pattern-desc">클래스의 인스턴스를 오직 하나만 생성. Spring의 모든 Bean은 기본적으로 Singleton 스코프.</div>
+      <div class="pattern-usage"><strong>Spring 적용</strong>@Bean 기본 스코프 / 공유 상태 없이 설계해야 Thread-safe</div>
+    </div>
+
+    <!-- Factory -->
+    <div class="pattern-card" style="--pc-color: #ffd60a;">
+      <div class="pattern-header">
+        <span class="pattern-badge">생성</span>
+        <div>
+          <div class="pattern-name">Factory</div>
+          <div class="pattern-kr">팩토리 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div class="pv-box" style="--pc-color:#ffd60a;">Creator (Factory)</div>
+          <div class="pv-arrow">↓ create()</div>
+          <div class="pv-row" style="gap:8px;">
+            <div class="pv-box" style="--pc-color:#ffd60a;font-size:9px;padding:4px 8px;">ProductA</div>
+            <div class="pv-box" style="--pc-color:#ffd60a;font-size:9px;padding:4px 8px;">ProductB</div>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-desc">객체 생성 코드를 별도 Factory로 분리. 클라이언트가 구체 클래스를 몰라도 객체 생성 가능.</div>
+      <div class="pattern-usage"><strong>Spring 적용</strong>BeanFactory / ApplicationContext가 대표 Factory</div>
+    </div>
+
+    <!-- Strategy -->
+    <div class="pattern-card" style="--pc-color: #f72585;">
+      <div class="pattern-header">
+        <span class="pattern-badge">행동</span>
+        <div>
+          <div class="pattern-name">Strategy</div>
+          <div class="pattern-kr">전략 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div class="pv-box" style="--pc-color:#f72585;">Context</div>
+          <div class="pv-arrow">↓ execute()</div>
+          <div class="pv-box main" style="--pc-color:#f72585;">«interface» Strategy</div>
+          <div class="pv-row" style="gap:8px;">
+            <div class="pv-box" style="--pc-color:#f72585;font-size:9px;padding:4px 8px;">StratA</div>
+            <div class="pv-box" style="--pc-color:#f72585;font-size:9px;padding:4px 8px;">StratB</div>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-desc">알고리즘을 인터페이스로 추상화. 런타임에 전략을 교체 가능. OCP 원칙 실현.</div>
+      <div class="pattern-usage"><strong>사용 예시</strong>결제 방법 선택 (카드/카카오/토스), 정렬 알고리즘 교체</div>
+    </div>
+
+    <!-- Observer -->
+    <div class="pattern-card" style="--pc-color: #c77dff;">
+      <div class="pattern-header">
+        <span class="pattern-badge">행동</span>
+        <div>
+          <div class="pattern-name">Observer</div>
+          <div class="pattern-kr">옵저버 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div class="pv-box main" style="--pc-color:#c77dff;">Subject (Publisher)</div>
+          <div class="pv-arrow">↓ notify()</div>
+          <div class="pv-row" style="gap:6px;">
+            <div class="pv-circle" style="font-size:9px;">O1</div>
+            <div class="pv-circle" style="font-size:9px;">O2</div>
+            <div class="pv-circle" style="font-size:9px;">O3</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);">Observers</div>
+        </div>
+      </div>
+      <div class="pattern-desc">Subject 상태 변화 시 모든 Observer에게 자동 알림. 느슨한 결합으로 이벤트 처리.</div>
+      <div class="pattern-usage"><strong>Spring 적용</strong>ApplicationEvent / @EventListener / Spring Kafka</div>
+    </div>
+
+    <!-- Decorator -->
+    <div class="pattern-card" style="--pc-color: #4cc9f0;">
+      <div class="pattern-header">
+        <span class="pattern-badge">구조</span>
+        <div>
+          <div class="pattern-name">Decorator</div>
+          <div class="pattern-kr">데코레이터 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="padding:3px 6px;border:1px solid #4cc9f0;border-radius:4px;font-size:9px;color:#4cc9f0;font-family:'JetBrains Mono',monospace;">LogDeco</div>
+            <span style="color:var(--muted);font-size:9px;">▸</span>
+            <div style="padding:3px 6px;border:1px solid #4cc9f0;border-radius:4px;font-size:9px;color:#4cc9f0;font-family:'JetBrains Mono',monospace;">CacheDeco</div>
+            <span style="color:var(--muted);font-size:9px;">▸</span>
+            <div style="padding:3px 6px;border:1px solid #4cc9f0;border-radius:4px;font-size:9px;color:#4cc9f0;background:color-mix(in srgb,#4cc9f0 20%,transparent);font-family:'JetBrains Mono',monospace;">Core</div>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-desc">객체를 감싸 기능을 동적으로 추가. 상속 없이 책임 확장. 래퍼(Wrapper) 패턴이라고도 함.</div>
+      <div class="pattern-usage"><strong>Spring 적용</strong>AOP (로깅, 트랜잭션) / HttpServletRequestWrapper</div>
+    </div>
+
+    <!-- Proxy -->
+    <div class="pattern-card" style="--pc-color: #ff9f1c;">
+      <div class="pattern-header">
+        <span class="pattern-badge">구조</span>
+        <div>
+          <div class="pattern-name">Proxy</div>
+          <div class="pattern-kr">프록시 패턴</div>
+        </div>
+      </div>
+      <div class="pattern-visual">
+        <div class="pv-singleton">
+          <div class="pv-row" style="gap:10px;">
+            <div class="pv-circle" style="font-size:9px;">Client</div>
+            <div class="pv-arrow">→</div>
+            <div class="pv-box main" style="--pc-color:#ff9f1c;">Proxy</div>
+            <div class="pv-arrow">→</div>
+            <div class="pv-circle" style="font-size:9px;border-color:#ff9f1c;color:#ff9f1c;">Real</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;">접근 제어 / 부가 기능</div>
+        </div>
+      </div>
+      <div class="pattern-desc">실제 객체 대신 대리자를 통해 접근. 지연 로딩, 캐싱, 접근 제어를 투명하게 처리.</div>
+      <div class="pattern-usage"><strong>Spring 적용</strong>@Transactional / @Cacheable 은 모두 AOP Proxy 기반</div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SOLID TABLE -->
+  <div class="section-title">SOLID 원칙</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>원칙</th>
+          <th>이름</th>
+          <th>핵심 한 문장</th>
+          <th>위반 신호</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="c2">S</td>
+          <td>Single Responsibility</td>
+          <td style="color:var(--muted);">클래스는 하나의 이유로만 변경되어야 한다</td>
+          <td><div class="tag-cell"><span class="mini-tag">God Class</span><span class="mini-tag">1000줄 Service</span></div></td>
+        </tr>
+        <tr>
+          <td class="c3">O</td>
+          <td>Open/Closed</td>
+          <td style="color:var(--muted);">확장에는 열려 있고 수정에는 닫혀 있어야 한다</td>
+          <td><div class="tag-cell"><span class="mini-tag">if instanceof</span><span class="mini-tag">switch 남발</span></div></td>
+        </tr>
+        <tr>
+          <td class="c1">L</td>
+          <td>Liskov Substitution</td>
+          <td style="color:var(--muted);">자식은 부모를 대체할 수 있어야 한다</td>
+          <td><div class="tag-cell"><span class="mini-tag">override 동작 변경</span></div></td>
+        </tr>
+        <tr>
+          <td class="c5">I</td>
+          <td>Interface Segregation</td>
+          <td style="color:var(--muted);">클라이언트는 쓰지 않는 메서드에 의존 금지</td>
+          <td><div class="tag-cell"><span class="mini-tag">뚱뚱한 Interface</span></div></td>
+        </tr>
+        <tr>
+          <td class="c6">D</td>
+          <td>Dependency Inversion</td>
+          <td style="color:var(--muted);">구체 클래스가 아닌 추상화에 의존해야 한다</td>
+          <td><div class="tag-cell"><span class="mini-tag">new 직접 생성</span><span class="mini-tag">DI 미사용</span></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- QA -->
+  <div class="section-title">단골 질문 & 모범 답변</div>
+  <div class="qa-list">
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.01</span>
+        레이어드 아키텍처에서 각 계층의 역할은?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Presentation → Business → Persistence → DB 순으로 단방향 의존합니다.</span><br>
+        Presentation은 요청/응답 처리, Business는 핵심 로직과 트랜잭션, Persistence는 DB 추상화, DB는 실제 데이터 저장을 담당합니다.<br>
+        각 계층은 바로 아래 계층만 참조해 결합도를 낮춥니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.02</span>
+        @Transactional 동작 원리는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Spring AOP의 Proxy 패턴으로 동작합니다."</span><br>
+        @Transactional이 붙은 메서드 호출 시, Spring이 만든 프록시 객체가 트랜잭션 시작 → 실제 메서드 실행 → 커밋/롤백 순으로 처리합니다.<br>
+        <div class="code-block">
+<span class="cm">// 같은 클래스 내 self-call은 프록시를 거치지 않아 트랜잭션 적용 X</span>
+<span class="kw">public class</span> <span class="cl">OrderService</span> {
+  <span class="an">@Transactional</span>
+  <span class="kw">public void</span> createOrder() { <span class="cm">// ✅ 프록시 통과</span>
+    saveOrder(); <span class="cm">// ❌ self-call — 트랜잭션 미적용</span>
+  }
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.03</span>
+        DI(의존성 주입) 방식 3가지와 권장 방식은?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"생성자 주입, 필드 주입, Setter 주입이 있습니다. 생성자 주입이 권장됩니다."</span>
+        <div class="code-block">
+<span class="cm">// ✅ 권장: 생성자 주입 — 불변, 테스트 용이, 순환 의존 감지</span>
+<span class="kw">private final</span> <span class="cl">UserRepository</span> repo;
+<span class="kw">public</span> <span class="cl">UserService</span>(<span class="cl">UserRepository</span> repo) { <span class="kw">this</span>.repo = repo; }
+
+<span class="cm">// ❌ 비권장: 필드 주입 — 테스트 어렵고 순환 참조 런타임 오류</span>
+<span class="an">@Autowired</span> <span class="kw">private</span> <span class="cl">UserRepository</span> repo;
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.04</span>
+        Entity와 DTO를 왜 분리하나요?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Entity는 DB 테이블과 직접 매핑되어 변경이 민감하고, DTO는 계층 간 데이터 전송 전용입니다."</span><br>
+        Entity를 직접 반환하면 불필요한 컬럼 노출, 양방향 순환 참조, API 스펙과 DB 스키마 강결합 문제가 발생합니다.<br>
+        분리하면 API 변경 시 Entity를 건드리지 않아도 되며, 보안과 유지보수가 향상됩니다.
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.05</span>
+        Strategy 패턴을 실무에서 어떻게 적용했나요?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"결제 방식 처리에 Strategy 패턴을 적용했습니다."</span>
+        <div class="code-block">
+<span class="kw">interface</span> <span class="cl">PaymentStrategy</span> { <span class="kw">void</span> pay(<span class="kw">int</span> amount); }
+
+<span class="an">@Component</span> <span class="kw">class</span> <span class="cl">CardPayment</span> <span class="kw">implements</span> <span class="cl">PaymentStrategy</span> { ... }
+<span class="an">@Component</span> <span class="kw">class</span> <span class="cl">KakaoPayment</span> <span class="kw">implements</span> <span class="cl">PaymentStrategy</span> { ... }
+
+<span class="cm">// PaymentType Enum으로 전략 선택 → if/else 제거, OCP 준수</span>
+        </div>
+        새로운 결제 수단 추가 시 기존 코드를 수정하지 않고 클래스만 추가하면 되어 확장에 유리합니다.
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.06</span>
+        MSA vs 모놀리식 아키텍처 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"모놀리식은 단일 배포 단위로 개발이 단순하지만, 규모가 커지면 배포·확장이 어렵습니다."</span><br>
+        MSA는 서비스별 독립 배포·확장·기술 스택 선택이 가능하지만 네트워크 지연, 분산 트랜잭션, 운영 복잡도가 증가합니다.<br>
+        초기에는 모놀리식으로 시작해 경계가 명확해지면 MSA로 분리하는 것을 권장합니다.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>// JAVA APPLICATION ARCHITECTURE CHEATSHEET &nbsp;·&nbsp; SPRING BOOT · JPA · DESIGN PATTERNS 🚀</footer>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
