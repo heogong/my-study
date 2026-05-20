@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터베이스 면접 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --accent5: #4cc9f0;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent1) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent2);
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .tag-green  { background: rgba(0,245,212,0.1); color: var(--accent1); border: 1px solid rgba(0,245,212,0.2); }
+  .tag-pink   { background: rgba(247,37,133,0.1); color: var(--accent2); border: 1px solid rgba(247,37,133,0.2); }
+  .tag-yellow { background: rgba(255,214,10,0.1); color: var(--accent3); border: 1px solid rgba(255,214,10,0.2); }
+  .tag-blue   { background: rgba(76,201,240,0.1); color: var(--accent5); border: 1px solid rgba(76,201,240,0.2); }
+  .tag-purple { background: rgba(114,9,183,0.2); color: #b76efb; border: 1px solid rgba(114,9,183,0.3); }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,245,212,0.3);
+    transform: translateY(-2px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .card.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card.c-purple::before { background: linear-gradient(90deg, #b76efb, transparent); }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card.c-green  .card-title { color: var(--accent1); }
+  .card.c-pink   .card-title { color: var(--accent2); }
+  .card.c-yellow .card-title { color: var(--accent3); }
+  .card.c-blue   .card-title { color: var(--accent5); }
+  .card.c-purple .card-title { color: #b76efb; }
+
+  /* Lists */
+  ul.dot-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.dot-list li {
+    font-size: 13px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  ul.dot-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent1);
+    font-size: 10px;
+    top: 2px;
+  }
+
+  ul.dot-list.pink li::before  { color: var(--accent2); }
+  ul.dot-list.yellow li::before { color: var(--accent3); }
+  ul.dot-list.blue li::before  { color: var(--accent5); }
+  ul.dot-list.purple li::before { color: #b76efb; }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .compare-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  th.h-green  { color: var(--accent1); }
+  th.h-pink   { color: var(--accent2); }
+  th.h-yellow { color: var(--accent3); }
+  th.h-blue   { color: var(--accent5); }
+
+  /* Highlight inline */
+  .hl { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .hl.g { color: var(--accent1); }
+  .hl.p { color: var(--accent2); }
+  .hl.y { color: var(--accent3); }
+  .hl.b { color: var(--accent5); }
+  .hl.v { color: #b76efb; }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  .badge.o { background: rgba(255,214,10,0.15); color: var(--accent3); }
+  .badge.r { background: rgba(247,37,133,0.15); color: var(--accent2); }
+  .badge.g { background: rgba(0,245,212,0.15); color: var(--accent1); }
+  .badge.b { background: rgba(76,201,240,0.15); color: var(--accent5); }
+
+  /* Step box */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--accent2);
+    opacity: 0.5;
+    min-width: 24px;
+  }
+
+  .step-body { font-size: 13px; line-height: 1.6; }
+  .step-body strong { color: #fff; font-weight: 700; }
+
+  /* Two-col layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Code block */
+  .code-block {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #a0a0c0;
+    overflow-x: auto;
+  }
+
+  .code-block .kw  { color: var(--accent2); }
+  .code-block .fn  { color: var(--accent1); }
+  .code-block .cm  { color: #444460; font-style: italic; }
+  .code-block .val { color: var(--accent3); }
+  .code-block .ty  { color: var(--accent5); }
+
+  /* Memo */
+  .memo {
+    background: rgba(255,214,10,0.04);
+    border: 1px solid rgba(255,214,10,0.15);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c0c0a0;
+    margin-top: 12px;
+  }
+
+  .memo strong { color: var(--accent3); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+  }
+
+  /* Small label */
+  .slabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* Full-width card */
+  .card-full {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .card-full::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card-full.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card-full.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card-full.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card-full.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+  /* Pill row */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(2)  { animation-delay: 0.05s; }
+  .section:nth-child(3)  { animation-delay: 0.10s; }
+  .section:nth-child(4)  { animation-delay: 0.15s; }
+  .section:nth-child(5)  { animation-delay: 0.20s; }
+  .section:nth-child(6)  { animation-delay: 0.25s; }
+  .section:nth-child(7)  { animation-delay: 0.30s; }
+  .section:nth-child(8)  { animation-delay: 0.35s; }
+  .section:nth-child(9)  { animation-delay: 0.40s; }
+  .section:nth-child(10) { animation-delay: 0.45s; }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3, .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="label">Interview Cheat Sheet</div>
+    <h1>Database</h1>
+    <div class="subtitle">설계 · 인덱스 · 정규화 · 트랜잭션 · 튜닝 · 대용량 · NoSQL</div>
+  </header>
+
+  <!-- 1. 핵심 개념 요약 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title">핵심 개념 & 용어</div>
+      <div class="section-tag tag-green">Fundamentals</div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-green">
+        <div class="card-title">키(Key) 종류</div>
+        <ul class="dot-list">
+          <li><span class="hl g">기본키(PK)</span> — 행을 유일하게 식별, NOT NULL + UNIQUE</li>
+          <li><span class="hl g">외래키(FK)</span> — 다른 테이블 PK 참조, 무결성 보장</li>
+          <li><span class="hl g">후보키</span> — PK가 될 수 있는 최소 속성 집합</li>
+          <li><span class="hl g">슈퍼키</span> — 유일성 만족(최소성 불필요)</li>
+          <li><span class="hl g">대리키(Surrogate)</span> — 의미 없는 인조 식별자(auto_increment 등)</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">무결성 제약</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">개체 무결성</span> — PK는 NULL 불가</li>
+          <li><span class="hl p">참조 무결성</span> — FK는 존재하는 PK값 또는 NULL</li>
+          <li><span class="hl p">도메인 무결성</span> — 허용된 값 범위(CHECK, type)</li>
+          <li><span class="hl p">NULL 무결성</span> — 필수 컬럼 NOT NULL 강제</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">카디널리티 & 관계</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">1:1</span> — 사용자 ↔ 사용자상세</li>
+          <li><span class="hl y">1:N</span> — 팀 ↔ 팀원 (가장 흔함)</li>
+          <li><span class="hl y">N:M</span> — 학생 ↔ 수업 → 중간테이블 필요</li>
+          <li><span class="hl y">카디널리티</span> — 컬럼 내 유니크 값 수, 인덱스 효율에 영향</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 정규화 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title">정규화 (Normalization)</div>
+      <div class="section-tag tag-pink">Design</div>
+    </div>
+    <div class="card-full c-pink" style="margin-bottom:16px;">
+      <div class="slabel">목적</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.6;">이상(Anomaly) 제거 — <span class="hl p">삽입 이상</span> · <span class="hl p">갱신 이상</span> · <span class="hl p">삭제 이상</span>을 방지하고 데이터 중복을 최소화</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>1NF</strong> — 원자값(Atomic): 반복 그룹 제거, 각 셀에 단일 값만 허용</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>2NF</strong> — 완전 함수 종속: 복합 PK 사용 시, 모든 일반 속성이 PK 전체에 종속 (부분 종속 제거)</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>3NF</strong> — 이행 함수 종속 제거: A→B→C에서 A→C 형태의 이행 종속 분리</div>
+      </div>
+      <div class="step">
+        <div class="step-num">BC</div>
+        <div class="step-body"><strong>BCNF</strong> — 결정자가 모두 후보키여야 함. 3NF보다 강한 조건, 이상이 여전히 존재하는 경우 적용</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>4NF / 5NF</strong> — 다치 종속·조인 종속 제거. 실무에서는 3NF~BCNF까지가 일반적</div>
+      </div>
+    </div>
+    <div class="memo"><strong>반정규화(Denormalization)</strong> — 성능을 위해 의도적으로 중복 허용. 조회 빈도 높고 조인이 비싼 경우 적용. 쓰기 성능 저하 & 데이터 불일치 위험을 감수해야 함.</div>
+  </div>
+
+  <!-- 3. 인덱스 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title">인덱스 (Index)</div>
+      <div class="section-tag tag-blue">Performance</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="card c-blue" style="margin-bottom:14px;">
+          <div class="card-title">B-Tree 인덱스</div>
+          <ul class="dot-list blue">
+            <li>MySQL InnoDB 기본 구조 (B+ Tree)</li>
+            <li>리프 노드에 실제 데이터 포인터 저장</li>
+            <li>범위 검색(<, >, BETWEEN, LIKE 'abc%')에 유리</li>
+            <li>= 검색, ORDER BY, GROUP BY에도 효율적</li>
+          </ul>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">Hash 인덱스</div>
+          <ul class="dot-list blue">
+            <li>= 검색만 O(1) 지원</li>
+            <li>범위 검색 불가, 정렬 불가</li>
+            <li>Memory 엔진, Redis 등에서 활용</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="card c-blue" style="margin-bottom:14px;">
+          <div class="card-title">클러스터드 vs 논클러스터드</div>
+          <ul class="dot-list blue">
+            <li><span class="hl b">Clustered</span> — 데이터가 인덱스 순서로 물리 저장. 테이블당 1개만 (InnoDB PK)</li>
+            <li><span class="hl b">Non-clustered</span> — 별도 인덱스 구조 → 리프에서 PK로 재조회(Bookmark Lookup)</li>
+            <li><span class="hl b">커버링 인덱스</span> — 쿼리에 필요한 컬럼이 인덱스에 모두 포함 → 테이블 접근 0회</li>
+          </ul>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">인덱스 사용 주의사항</div>
+          <ul class="dot-list blue">
+            <li><span class="hl b">Index Range Scan</span> 유도 (IS NULL, !=, % 앞 LIKE 회피)</li>
+            <li>복합 인덱스 — 선두 컬럼 = 조건 필수 (좌측 접두사 규칙)</li>
+            <li>카디널리티 낮은 컬럼 (성별 등) 단독 인덱스 비효율</li>
+            <li>인덱스 과다 → INSERT/UPDATE 성능 저하</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 트랜잭션 & ACID -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title">트랜잭션 & ACID</div>
+      <div class="section-tag tag-green">Transaction</div>
+    </div>
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="card c-green">
+        <div class="card-title">ACID 속성</div>
+        <ul class="dot-list">
+          <li><span class="hl g">Atomicity</span> — 전부 성공 or 전부 실패 (ROLLBACK)</li>
+          <li><span class="hl g">Consistency</span> — 트랜잭션 전후 DB 무결성 유지</li>
+          <li><span class="hl g">Isolation</span> — 동시 트랜잭션 간 간섭 방지</li>
+          <li><span class="hl g">Durability</span> — 커밋된 데이터는 장애 후에도 보존 (WAL)</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">동시성 문제</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">Dirty Read</span> — 커밋 안 된 데이터를 읽음</li>
+          <li><span class="hl p">Non-Repeatable Read</span> — 같은 행 재조회 시 값이 다름</li>
+          <li><span class="hl p">Phantom Read</span> — 범위 재조회 시 행 수가 다름</li>
+          <li><span class="hl p">Lost Update</span> — 두 트랜잭션이 동시에 같은 행 수정</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-full c-yellow">
+      <div class="card-title" style="color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">격리 수준 (Isolation Level)</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-yellow">격리 수준</th>
+            <th class="h-pink">Dirty Read</th>
+            <th class="h-pink">Non-Repeatable</th>
+            <th class="h-pink">Phantom</th>
+            <th class="h-blue">성능</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="hl g">READ UNCOMMITTED</span></td><td>가능</td><td>가능</td><td>가능</td><td>최고</td></tr>
+          <tr><td><span class="hl b">READ COMMITTED</span> <span class="badge g">기본(PG)</span></td><td>방지</td><td>가능</td><td>가능</td><td>높음</td></tr>
+          <tr><td><span class="hl y">REPEATABLE READ</span> <span class="badge g">기본(MySQL)</span></td><td>방지</td><td>방지</td><td>가능</td><td>보통</td></tr>
+          <tr><td><span class="hl p">SERIALIZABLE</span></td><td>방지</td><td>방지</td><td>방지</td><td>최저</td></tr>
+        </tbody>
+      </table>
+      <div class="memo" style="margin-top:12px;"><strong>InnoDB REPEATABLE READ</strong>는 MVCC(다중 버전 동시성 제어)로 Phantom Read도 대부분 방지. SELECT … FOR UPDATE 시에는 Next-key Lock 사용.</div>
+    </div>
+  </div>
+
+  <!-- 5. 락(Lock) -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title">락(Lock) & 동시성 제어</div>
+      <div class="section-tag tag-purple">Concurrency</div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-purple">
+        <div class="card-title">락 종류</div>
+        <ul class="dot-list purple">
+          <li><span class="hl v">Shared Lock (S)</span> — 읽기 락, 여러 트랜잭션 동시 획득 가능</li>
+          <li><span class="hl v">Exclusive Lock (X)</span> — 쓰기 락, 단독 점유</li>
+          <li><span class="hl v">Intent Lock</span> — 계층 락(테이블→행)에서 상위 레벨 의도 표시</li>
+          <li><span class="hl v">Gap Lock</span> — 범위 사이 삽입 방지 (Phantom 방지)</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">낙관적 vs 비관적 락</div>
+        <ul class="dot-list">
+          <li><span class="hl g">낙관적(Optimistic)</span> — 충돌 적다고 가정, 커밋 시 버전 비교 → 실패 시 RETRY</li>
+          <li><span class="hl g">비관적(Pessimistic)</span> — 충돌 자주 발생, SELECT FOR UPDATE로 선점</li>
+          <li>읽기 多 → 낙관적 / 쓰기 多·충돌 高 → 비관적</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">데드락(Deadlock)</div>
+        <ul class="dot-list pink">
+          <li>두 트랜잭션이 서로의 락을 대기 — 교착 상태</li>
+          <li><span class="hl p">예방</span> — 항상 동일 순서로 자원 획득</li>
+          <li><span class="hl p">탐지 & 해결</span> — DBMS가 자동 감지 후 한 쪽 ROLLBACK</li>
+          <li><span class="hl p">타임아웃</span> — innodb_lock_wait_timeout 설정</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. 쿼리 튜닝 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title">쿼리 튜닝</div>
+      <div class="section-tag tag-yellow">Tuning</div>
+    </div>
+    <div class="two-col" style="margin-bottom:16px;">
+      <div>
+        <div class="card c-yellow">
+          <div class="card-title">EXPLAIN 읽기</div>
+          <ul class="dot-list yellow">
+            <li><span class="hl y">type</span> — ALL(풀스캔) &gt; index &gt; range &gt; ref &gt; eq_ref &gt; const</li>
+            <li><span class="hl y">key</span> — 실제 사용된 인덱스</li>
+            <li><span class="hl y">rows</span> — 예상 조회 행 수 (낮을수록 ↑)</li>
+            <li><span class="hl y">Extra</span> — Using filesort / Using temporary 등장 시 주의</li>
+            <li><span class="hl y">filtered</span> — WHERE 조건에서 걸러지는 비율</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="card c-yellow">
+          <div class="card-title">자주 쓰는 튜닝 패턴</div>
+          <ul class="dot-list yellow">
+            <li>WHERE 컬럼에 함수 감싸지 않기 → <span class="hl y">인덱스 무력화</span></li>
+            <li>SELECT * 지양 → 필요한 컬럼만 지정</li>
+            <li>N+1 문제 → JOIN 또는 Batch 조회로 해결</li>
+            <li>OFFSET 大 → <span class="hl y">커서 기반 페이징</span>으로 대체</li>
+            <li>서브쿼리 → 인라인뷰 or JOIN으로 개선</li>
+            <li>UNION → UNION ALL (중복 제거 불필요 시)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+<span class="cm">-- 인덱스 무력화 예시 (나쁜 쿼리)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> orders <span class="kw">WHERE</span> <span class="fn">YEAR</span>(created_at) = <span class="val">2024</span>;  <span class="cm">-- 함수 → Full Scan</span>
+
+<span class="cm">-- 개선: 범위 조건으로 인덱스 활용</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> orders <span class="kw">WHERE</span> created_at <span class="kw">BETWEEN</span> <span class="val">'2024-01-01'</span> <span class="kw">AND</span> <span class="val">'2024-12-31'</span>;
+
+<span class="cm">-- 커서 페이징 (OFFSET 대신)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> orders <span class="kw">WHERE</span> id &gt; <span class="val">:last_id</span> <span class="kw">ORDER BY</span> id <span class="kw">LIMIT</span> <span class="val">20</span>;
+    </div>
+  </div>
+
+  <!-- 7. 설계 패턴 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title">DB 설계 패턴</div>
+      <div class="section-tag tag-green">Design Pattern</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">ERD 설계 프로세스</div>
+        <div class="steps" style="gap:8px;">
+          <div class="step" style="padding:8px 12px;">
+            <div class="step-num" style="font-size:18px;">1</div>
+            <div class="step-body"><strong>요구사항 분석</strong> — 엔티티 식별 (명사 추출)</div>
+          </div>
+          <div class="step" style="padding:8px 12px;">
+            <div class="step-num" style="font-size:18px;">2</div>
+            <div class="step-body"><strong>관계 정의</strong> — 카디널리티 결정 (1:1, 1:N, N:M)</div>
+          </div>
+          <div class="step" style="padding:8px 12px;">
+            <div class="step-num" style="font-size:18px;">3</div>
+            <div class="step-body"><strong>속성 정의</strong> — 필수/선택, 도메인 타입 지정</div>
+          </div>
+          <div class="step" style="padding:8px 12px;">
+            <div class="step-num" style="font-size:18px;">4</div>
+            <div class="step-body"><strong>정규화</strong> → 필요 시 성능 반정규화</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card c-blue" style="margin-bottom:14px;">
+          <div class="card-title">소프트 삭제 (Soft Delete)</div>
+          <ul class="dot-list blue">
+            <li><code style="color:var(--accent5);font-size:11px;">deleted_at TIMESTAMP NULL</code> 컬럼 추가</li>
+            <li>조회 시 <span class="hl b">WHERE deleted_at IS NULL</span> 필수</li>
+            <li>감사 이력 보존 & 복구 가능, 파티셔닝 고려 필요</li>
+          </ul>
+        </div>
+        <div class="card c-pink">
+          <div class="card-title">이력 관리 패턴</div>
+          <ul class="dot-list pink">
+            <li><span class="hl p">Temporal Table</span> — valid_from / valid_to로 시간 관리</li>
+            <li><span class="hl p">Audit Log Table</span> — 변경 전후 값을 별도 테이블에 기록</li>
+            <li><span class="hl p">Event Sourcing</span> — 상태 대신 이벤트만 저장, 현재 상태는 재생</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 대용량 트래픽 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div class="section-title">대용량 트래픽 & 확장 전략</div>
+      <div class="section-tag tag-pink">Scale</div>
+    </div>
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="card c-pink">
+        <div class="card-title">Read Replica (복제)</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">Master</span> 쓰기 전용 / <span class="hl p">Replica</span> 읽기 전용으로 분리</li>
+          <li>비동기 복제 → 복제 지연(Replication Lag) 발생 가능</li>
+          <li>읽기 80~90% 트래픽 분산 효과</li>
+          <li>재고 차감 등 강한 일관성 필요 시 Master 직접 조회</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">샤딩 (Sharding)</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">수평 샤딩</span> — 동일 스키마, 데이터를 여러 DB에 분산</li>
+          <li><span class="hl p">샤드 키</span> — user_id % N, 지역, 날짜 등으로 라우팅</li>
+          <li>Cross-shard JOIN 불가, 분산 트랜잭션 복잡</li>
+          <li>핫스팟 주의 → 균등 분산 설계 필수</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-green">
+        <div class="card-title">캐싱 전략</div>
+        <ul class="dot-list">
+          <li><span class="hl g">Look-aside (Cache-aside)</span> — 캐시 미스 시 DB 조회 후 캐시 적재 (가장 일반)</li>
+          <li><span class="hl g">Write-through</span> — DB와 캐시 동시 쓰기</li>
+          <li><span class="hl g">Write-back</span> — 캐시만 쓰고 나중에 DB 반영 (유실 위험)</li>
+          <li>TTL 설정, Cache Stampede 방지 (Lock / Jitter)</li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">Connection Pool</div>
+        <ul class="dot-list blue">
+          <li>DB 커넥션 생성 비용이 크므로 풀로 재사용</li>
+          <li>HikariCP — Spring Boot 기본 (MySQL 기준 권장 10~20)</li>
+          <li><span class="hl b">pool_size = (core_count × 2) + effective_spindle_count</span></li>
+          <li>커넥션 고갈 → timeout, 쿼리 슬로우 함께 확인</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">파티셔닝</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">Range</span> — 날짜/ID 범위로 파티션 분리 (로그 테이블)</li>
+          <li><span class="hl y">List</span> — 특정 값(지역코드 등)으로 분리</li>
+          <li><span class="hl y">Hash</span> — 균등 분산</li>
+          <li>파티션 프루닝 — WHERE에 파티션 키 포함 시 스캔 최소화</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. SQL vs NoSQL -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div class="section-title">SQL vs NoSQL</div>
+      <div class="section-tag tag-blue">Comparison</div>
+    </div>
+    <div class="card-full c-blue" style="margin-bottom:16px;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th class="h-green">SQL (RDB)</th>
+            <th class="h-blue">NoSQL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>스키마</td>
+            <td>고정 스키마, 엄격한 타입</td>
+            <td>유연한 스키마 (Schema-less)</td>
+          </tr>
+          <tr>
+            <td>쿼리</td>
+            <td>표준 SQL, 복잡한 JOIN 가능</td>
+            <td>DB마다 고유 API, JOIN 제한</td>
+          </tr>
+          <tr>
+            <td>확장</td>
+            <td>수직 확장 위주, 샤딩 복잡</td>
+            <td>수평 확장에 최적화</td>
+          </tr>
+          <tr>
+            <td>일관성</td>
+            <td>ACID 완전 지원</td>
+            <td>BASE (Basically Available, Eventually Consistent)</td>
+          </tr>
+          <tr>
+            <td>적합 케이스</td>
+            <td>금융, 주문, 복잡한 비즈니스 로직</td>
+            <td>대규모 비정형 데이터, 고속 읽기/쓰기</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-title">Document (MongoDB)</div>
+        <ul class="dot-list blue">
+          <li>JSON/BSON 문서 단위 저장</li>
+          <li>중첩 구조, 배열 자유롭게 표현</li>
+          <li>컨텐츠, 카탈로그, CMS에 적합</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">Key-Value (Redis)</div>
+        <ul class="dot-list">
+          <li>초고속 인메모리, 단순 구조</li>
+          <li>세션, 캐시, 분산락, 리더보드</li>
+          <li>TTL 기반 자동 만료 지원</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">Wide-column (Cassandra)</div>
+        <ul class="dot-list pink">
+          <li>파티션 키 기반 분산, 쓰기 최적화</li>
+          <li>IoT, 시계열, 로그 대량 적재</li>
+          <li>쿼리 패턴에 맞게 테이블 설계</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 면접 빈출 Q&A -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div class="section-title">면접 빈출 Q&amp;A</div>
+      <div class="section-tag tag-yellow">Interview</div>
+    </div>
+    <div class="card-full c-yellow">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-yellow" style="width:38%;">질문</th>
+            <th class="h-green">핵심 답변 포인트</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>인덱스가 있는데 왜 느린가요?</td>
+            <td>풀스캔이 유리한 경우(카디널리티 낮음), 함수 감싸기, 복합인덱스 선두 컬럼 미사용, 인덱스 통계 오래됨 → ANALYZE 실행</td>
+          </tr>
+          <tr>
+            <td>트랜잭션 격리 수준을 어떻게 선택하나요?</td>
+            <td>READ COMMITTED(일반 서비스) vs REPEATABLE READ(재조회 일관성 필요 시). SERIALIZABLE은 성능 부담 커서 특수 케이스만</td>
+          </tr>
+          <tr>
+            <td>N+1 문제란 무엇이고 어떻게 해결하나요?</td>
+            <td>1번 쿼리로 N개 결과 → N번 추가 쿼리 발생. JOIN 또는 IN 절 Batch, JPA에서는 Fetch Join / @BatchSize / EntityGraph 사용</td>
+          </tr>
+          <tr>
+            <td>대용량 테이블 조회 성능을 높이려면?</td>
+            <td>인덱스 최적화, 커버링 인덱스, 파티셔닝, 캐싱(Redis), Read Replica, 쿼리 재작성, OFFSET→커서 페이징</td>
+          </tr>
+          <tr>
+            <td>샤딩과 파티셔닝의 차이는?</td>
+            <td>파티셔닝 — 단일 DB 내 논리/물리 분할. 샤딩 — 여러 물리 DB에 분산. 샤딩은 scale-out, 파티셔닝은 관리/성능 목적</td>
+          </tr>
+          <tr>
+            <td>MVCC란?</td>
+            <td>쓰기 시 이전 버전을 Undo Log에 유지. 읽기는 스냅샷으로 처리 → Lock 없이 동시성 향상. InnoDB REPEATABLE READ의 기반</td>
+          </tr>
+          <tr>
+            <td>CAP 정리를 설명하세요</td>
+            <td>분산 시스템은 Consistency, Availability, Partition Tolerance 3가지 중 2가지만 동시에 보장 가능. P는 피할 수 없으므로 CP(MySQL, ZooKeeper) vs AP(Cassandra, DynamoDB) 선택</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pill-row">
+      <span class="pill">EXPLAIN ANALYZE</span>
+      <span class="pill">Slow Query Log</span>
+      <span class="pill">MVCC</span>
+      <span class="pill">WAL(Write-Ahead Log)</span>
+      <span class="pill">Buffer Pool</span>
+      <span class="pill">Redo / Undo Log</span>
+      <span class="pill">두 단계 커밋(2PC)</span>
+      <span class="pill">Saga Pattern</span>
+      <span class="pill">CDC(Change Data Capture)</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
