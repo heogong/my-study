@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring 면접 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --spring: #6adb6a;
+    --spring2: #3ecf8e;
+    --spring3: #00b4d8;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(106,219,106,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(106,219,106,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--spring);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--spring) 55%, var(--spring3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  /* ── Section Title ── */
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent3), transparent);
+    opacity: 0.3;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* ══════════════════════════════
+     MVC 요청 흐름 다이어그램
+  ══════════════════════════════ */
+  .flow-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.1s both;
+    overflow-x: auto;
+  }
+
+  .flow-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--spring);
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  /* 가로 흐름 레이아웃 */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: nowrap;
+    min-width: 700px;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .flow-box {
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    position: relative;
+    min-width: 90px;
+  }
+
+  .flow-box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .flow-box-sub {
+    font-size: 10px;
+    margin-top: 3px;
+    opacity: 0.7;
+  }
+
+  .fbox-client   { background: rgba(106,219,106,0.1);  border: 1.5px solid var(--spring);  color: var(--spring); }
+  .fbox-ds       { background: rgba(0,180,216,0.1);    border: 1.5px solid var(--spring3); color: var(--spring3); }
+  .fbox-handler  { background: rgba(255,214,10,0.1);   border: 1.5px solid var(--accent3); color: var(--accent3); }
+  .fbox-ctrl     { background: rgba(247,37,133,0.1);   border: 1.5px solid var(--accent2); color: var(--accent2); }
+  .fbox-service  { background: rgba(114,9,183,0.15);   border: 1.5px solid var(--accent4); color: #b060ff; }
+  .fbox-repo     { background: rgba(62,207,142,0.1);   border: 1.5px solid var(--spring2); color: var(--spring2); }
+  .fbox-db       { background: rgba(255,255,255,0.05); border: 1.5px solid #444460;        color: #aaaacc; }
+  .fbox-view     { background: rgba(0,245,212,0.1);    border: 1.5px solid var(--accent1); color: var(--accent1); }
+
+  /* 화살표 + 라벨 */
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+
+  .arrow-line {
+    width: 36px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--border), #555570);
+    position: relative;
+  }
+
+  .arrow-line::after {
+    content: '▶';
+    position: absolute;
+    right: -8px;
+    top: -6px;
+    font-size: 10px;
+    color: #555570;
+  }
+
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* 복귀 화살표 (아래) */
+  .flow-return {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 700px;
+    margin-top: 8px;
+    padding: 0 0 0 0;
+    position: relative;
+  }
+
+  .return-track {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, #333350, #555570, #333350);
+    position: relative;
+  }
+
+  .return-label-wrap {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+    background: var(--card);
+    padding: 0 6px;
+  }
+
+  .return-arrow-left {
+    font-size: 10px;
+    color: #555570;
+    margin-right: -2px;
+  }
+
+  /* ══════════════════════════════
+     IoC / DI 다이어그램
+  ══════════════════════════════ */
+  .ioc-diagram {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  @media (max-width: 640px) {
+    .ioc-diagram { grid-template-columns: 1fr; }
+    .flow-row, .flow-return { min-width: 620px; }
+  }
+
+  .ioc-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .ioc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* IoC 컨테이너 시각화 */
+  .ioc-container {
+    border: 1.5px dashed var(--spring);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .ioc-container-label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: var(--card);
+    padding: 0 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--spring);
+    letter-spacing: 1px;
+  }
+
+  .bean-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .bean {
+    border: 1px solid color-mix(in srgb, var(--spring) 40%, transparent);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--spring);
+    background: color-mix(in srgb, var(--spring) 6%, transparent);
+    text-align: center;
+    position: relative;
+  }
+
+  .bean::before {
+    content: '🫘';
+    font-size: 8px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .di-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .di-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .di-class {
+    flex: 1;
+    border: 1.5px solid var(--accent2);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    background: color-mix(in srgb, var(--accent2) 6%, transparent);
+  }
+
+  .di-inject {
+    font-size: 16px;
+    color: var(--accent3);
+    font-weight: 900;
+  }
+
+  .di-dep {
+    flex: 1;
+    border: 1.5px solid var(--spring);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--spring);
+    background: color-mix(in srgb, var(--spring) 6%, transparent);
+  }
+
+  .di-note {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  /* ══════════════════════════════
+     AOP 다이어그램
+  ══════════════════════════════ */
+  .aop-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .aop-layer {
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    position: relative;
+  }
+
+  .aop-around  { background: rgba(247,37,133,0.08); border: 1px dashed var(--accent2); color: var(--accent2); }
+  .aop-before  { background: rgba(255,214,10,0.08); border: 1px solid var(--accent3); color: var(--accent3); }
+  .aop-method  { background: rgba(106,219,106,0.12); border: 2px solid var(--spring); color: var(--spring); font-weight: 700; margin: 4px 16px; }
+  .aop-after   { background: rgba(0,180,216,0.08); border: 1px solid var(--spring3); color: var(--spring3); }
+
+  .aop-tag {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 9px;
+    letter-spacing: 1px;
+    opacity: 0.6;
+  }
+
+  /* ══════════════════════════════
+     Annotation 카드 그리드
+  ══════════════════════════════ */
+  .anno-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+
+  .anno-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    animation: fadeUp 0.5s ease both;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .anno-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--card-accent, var(--spring));
+  }
+
+  .anno-card::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: var(--card-accent, var(--spring));
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+
+  .anno-group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .anno-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .anno-item:last-child { border-bottom: none; }
+
+  .anno-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--card-accent, var(--spring));
+    font-weight: 700;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  .anno-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ══════════════════════════════
+     레이어 구조 (계층 다이어그램)
+  ══════════════════════════════ */
+  .layer-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .layer {
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    cursor: default;
+    transition: filter 0.2s;
+  }
+  .layer:hover { filter: brightness(1.15); }
+
+  .layer-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .layer-anno {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  .layer-desc {
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .layer-left { display: flex; flex-direction: column; }
+  .layer-right { font-size: 20px; opacity: 0.5; }
+
+  .l-presentation { background: rgba(247,37,133,0.12); border: 1.5px solid var(--accent2); color: var(--accent2); }
+  .l-business     { background: rgba(114,9,183,0.12);  border: 1.5px solid #b060ff;       color: #b060ff; }
+  .l-data         { background: rgba(62,207,142,0.12); border: 1.5px solid var(--spring2); color: var(--spring2); }
+  .l-db           { background: rgba(255,255,255,0.04); border: 1.5px dashed #444460;      color: #8888aa; }
+
+  .layer-connector {
+    display: flex;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* ══════════════════════════════
+     QA 아코디언
+  ══════════════════════════════ */
+  .qa-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 48px; }
+
+  .qa-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .qa-item:hover { border-color: #333350; }
+  .qa-item.open { border-color: var(--spring); }
+
+  .qa-q {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .qa-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--spring) 20%, transparent);
+    color: var(--spring);
+    flex-shrink: 0;
+  }
+
+  .qa-chevron {
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform 0.3s;
+    font-size: 12px;
+  }
+  .qa-item.open .qa-chevron { transform: rotate(180deg); }
+
+  .qa-a {
+    display: none;
+    padding: 14px 20px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.85;
+    border-top: 1px solid var(--border);
+  }
+  .qa-item.open .qa-a { display: block; }
+
+  .qa-a .hl { font-family: 'JetBrains Mono', monospace; color: var(--spring); font-size: 12px; }
+  .qa-a .hl2 { font-family: 'JetBrains Mono', monospace; color: var(--accent3); font-size: 12px; }
+
+  /* ══════════════════════════════
+     Transaction 흐름
+  ══════════════════════════════ */
+  .tx-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 460px;
+    margin: 0 auto 0;
+  }
+
+  .tx-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .tx-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .tx-commit { background: rgba(106,219,106,0.07); }
+  .tx-commit .tx-num { background: rgba(106,219,106,0.2); color: var(--spring); border: 1px solid var(--spring); }
+
+  .tx-rollback { background: rgba(247,37,133,0.07); }
+  .tx-rollback .tx-num { background: rgba(247,37,133,0.2); color: var(--accent2); border: 1px solid var(--accent2); }
+
+  .tx-neutral { background: rgba(255,255,255,0.03); }
+  .tx-neutral .tx-num { background: rgba(255,255,255,0.08); color: var(--muted); border: 1px solid var(--border); }
+
+  .tx-text { color: var(--text); font-size: 13px; }
+  .tx-tag {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .tag-ok { background: rgba(106,219,106,0.15); color: var(--spring); }
+  .tag-fail { background: rgba(247,37,133,0.15); color: var(--accent2); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .inner-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .inner-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--spring);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Routine */
+  .routine {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+  @media (max-width: 600px) { .routine { grid-template-columns: 1fr; } }
+
+  .routine-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .routine-day {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .routine-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  .routine-task {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .anno-card:nth-child(1) { animation-delay: 0.05s; }
+  .anno-card:nth-child(2) { animation-delay: 0.1s; }
+  .anno-card:nth-child(3) { animation-delay: 0.15s; }
+  .anno-card:nth-child(4) { animation-delay: 0.2s; }
+  .anno-card:nth-child(5) { animation-delay: 0.25s; }
+  .qa-item:nth-child(1) { animation-delay: 0.05s; }
+  .qa-item:nth-child(2) { animation-delay: 0.1s; }
+  .qa-item:nth-child(3) { animation-delay: 0.15s; }
+  .qa-item:nth-child(4) { animation-delay: 0.2s; }
+  .qa-item:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="label">// INTERVIEW PREP — SPRING FRAMEWORK</div>
+    <h1>Spring<br>면접 치트시트</h1>
+    <p class="subtitle">핵심 구조 · 요청 흐름 · 어노테이션 · 단골 질문</p>
+  </header>
+
+  <!-- ① Spring MVC 요청 흐름 -->
+  <div class="section-title">Spring MVC 요청 처리 흐름</div>
+  <div class="flow-diagram">
+    <div class="flow-title">// HTTP Request → Response 전체 흐름</div>
+    <div style="overflow-x: auto;">
+      <div class="flow-row">
+
+        <div class="flow-node">
+          <div class="flow-box fbox-client">
+            <div class="flow-box-label">Client</div>
+            <div class="flow-box-sub">브라우저 / 앱</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">HTTP Request</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-ds">
+            <div class="flow-box-label">Dispatcher<br>Servlet</div>
+            <div class="flow-box-sub">Front Controller</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">매핑 조회</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-handler">
+            <div class="flow-box-label">Handler<br>Mapping</div>
+            <div class="flow-box-sub">URL → Controller</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">호출</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-ctrl">
+            <div class="flow-box-label">Controller</div>
+            <div class="flow-box-sub">@Controller</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">비즈니스 위임</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-service">
+            <div class="flow-box-label">Service</div>
+            <div class="flow-box-sub">@Service</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">DB 접근</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-repo">
+            <div class="flow-box-label">Repository</div>
+            <div class="flow-box-sub">@Repository</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">SQL / ORM</div>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-box fbox-db">
+            <div class="flow-box-label">DB</div>
+            <div class="flow-box-sub">MySQL / JPA</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 복귀 화살표 라인 -->
+      <div style="min-width: 700px; margin-top: 12px; padding: 0 44px;">
+        <div style="display:flex; align-items:center; gap:0;">
+          <span style="font-size:10px; color:#555570;">◀</span>
+          <div style="flex:1; height:2px; background: linear-gradient(90deg,#333350,#555570,#555570,#333350); position:relative;">
+            <span style="position:absolute;left:50%;transform:translateX(-50%);top:-9px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);background:var(--card);padding:0 8px;white-space:nowrap;">◀ Response / ModelAndView 반환 ◀</span>
+          </div>
+          <span style="font-size:10px; color:#555570;"></span>
+        </div>
+      </div>
+
+      <!-- ViewResolver 행 -->
+      <div style="min-width:700px; margin-top:20px; display:flex; align-items:center; justify-content:center; gap:0;">
+        <div style="flex:1;"></div>
+        <div class="flow-node" style="margin: 0 0 0 0;">
+          <div class="flow-box fbox-ds" style="min-width:80px;">
+            <div class="flow-box-label">View<br>Resolver</div>
+            <div class="flow-box-sub">뷰 결정</div>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">렌더링</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box fbox-view">
+            <div class="flow-box-label">View</div>
+            <div class="flow-box-sub">HTML / JSON</div>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">HTTP Response</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box fbox-client">
+            <div class="flow-box-label">Client</div>
+            <div class="flow-box-sub">응답 수신</div>
+          </div>
+        </div>
+        <div style="flex:1;"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; padding:12px 16px; background:rgba(0,0,0,0.2); border-radius:8px; font-size:12px; color:var(--muted); line-height:1.8;">
+      💡 <span style="color:var(--spring); font-family:'JetBrains Mono',monospace; font-size:11px;">@RestController</span> 사용 시 ViewResolver 단계 없이 JSON/XML 직렬화 후 바로 응답 &nbsp;|&nbsp;
+      Interceptor는 DispatcherServlet ↔ Controller 사이에서 동작
+    </div>
+  </div>
+
+  <!-- ② 계층 구조 + IoC/DI -->
+  <div class="section-title">계층 구조 & IoC / DI</div>
+  <div class="two-col">
+
+    <!-- 계층 다이어그램 -->
+    <div class="inner-card">
+      <div class="inner-title">// LAYERED ARCHITECTURE</div>
+      <div class="layers">
+        <div class="layer l-presentation">
+          <div class="layer-left">
+            <div class="layer-name">Presentation Layer</div>
+            <div class="layer-desc">@Controller / @RestController</div>
+          </div>
+          <div class="layer-right">🖥</div>
+        </div>
+        <div class="layer-connector">↕</div>
+        <div class="layer l-business">
+          <div class="layer-left">
+            <div class="layer-name">Business Layer</div>
+            <div class="layer-desc">@Service · 트랜잭션 관리</div>
+          </div>
+          <div class="layer-right">⚙️</div>
+        </div>
+        <div class="layer-connector">↕</div>
+        <div class="layer l-data">
+          <div class="layer-left">
+            <div class="layer-name">Data Access Layer</div>
+            <div class="layer-desc">@Repository · JPA / MyBatis</div>
+          </div>
+          <div class="layer-right">🗄</div>
+        </div>
+        <div class="layer-connector">↕</div>
+        <div class="layer l-db">
+          <div class="layer-left">
+            <div class="layer-name">Database</div>
+            <div class="layer-desc">MySQL / PostgreSQL / H2</div>
+          </div>
+          <div class="layer-right">💾</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IoC / DI 시각화 -->
+    <div class="inner-card">
+      <div class="inner-title">// IoC CONTAINER & DI</div>
+
+      <div class="ioc-container">
+        <div class="ioc-container-label">IoC CONTAINER</div>
+        <div class="bean-grid">
+          <div class="bean">UserService</div>
+          <div class="bean">OrderService</div>
+          <div class="bean">UserRepo</div>
+          <div class="bean">DataSource</div>
+        </div>
+      </div>
+
+      <div style="text-align:center; font-size:12px; color:var(--muted); margin: 6px 0 12px;">
+        ↑ 컨테이너가 Bean 생성·관리·주입
+      </div>
+
+      <div class="di-visual">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-bottom:4px;">의존성 주입 방식</div>
+        <div class="di-row">
+          <div class="di-class">@Autowired<br><span style="font-size:10px; opacity:0.6;">필드 주입</span></div>
+          <div class="di-inject">→</div>
+          <div class="di-dep">UserService</div>
+        </div>
+        <div class="di-row">
+          <div class="di-class">생성자 주입<br><span style="font-size:10px; opacity:0.6;">✅ 권장</span></div>
+          <div class="di-inject">→</div>
+          <div class="di-dep">UserService</div>
+        </div>
+        <div class="di-note">
+          생성자 주입을 권장하는 이유:<br>
+          ① 불변성 보장 (final 사용 가능)<br>
+          ② 테스트 용이<br>
+          ③ 순환 의존성 컴파일 타임 감지
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ AOP -->
+  <div class="section-title">AOP — Aspect Oriented Programming</div>
+  <div class="two-col">
+    <div class="inner-card">
+      <div class="inner-title">// ADVICE 실행 순서</div>
+      <div class="aop-visual">
+        <div class="aop-layer aop-around">@Around (진입) <span class="aop-tag">감싸기</span></div>
+        <div class="aop-layer aop-before">@Before <span class="aop-tag">메서드 전</span></div>
+        <div class="aop-layer aop-method">🎯 Target Method 실행 <span class="aop-tag">핵심 로직</span></div>
+        <div class="aop-layer aop-after">@After / @AfterReturning / @AfterThrowing <span class="aop-tag">후처리</span></div>
+        <div class="aop-layer aop-around">@Around (복귀) <span class="aop-tag">감싸기</span></div>
+      </div>
+    </div>
+
+    <div class="inner-card">
+      <div class="inner-title">// AOP 핵심 용어</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="anno-item">
+          <div class="anno-name" style="color:var(--accent2);">Aspect</div>
+          <div class="anno-desc">공통 관심사 모듈 (로깅, 보안, 트랜잭션)</div>
+        </div>
+        <div class="anno-item">
+          <div class="anno-name" style="color:var(--accent3);">Pointcut</div>
+          <div class="anno-desc">Advice가 적용될 위치 표현식</div>
+        </div>
+        <div class="anno-item">
+          <div class="anno-name" style="color:var(--spring);">Advice</div>
+          <div class="anno-desc">실제 실행될 공통 로직 코드</div>
+        </div>
+        <div class="anno-item">
+          <div class="anno-name" style="color:var(--spring3);">JoinPoint</div>
+          <div class="anno-desc">Advice가 적용될 수 있는 지점</div>
+        </div>
+        <div class="anno-item">
+          <div class="anno-name" style="color:#b060ff;">Weaving</div>
+          <div class="anno-desc">Aspect를 Target에 적용하는 과정</div>
+        </div>
+      </div>
+      <div style="margin-top:12px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:11px; color:var(--muted);">
+        💡 Spring AOP = 런타임 프록시 기반 (CGLIB / JDK Dynamic Proxy)
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ④ 어노테이션 -->
+  <div class="section-title">핵심 어노테이션 정리</div>
+  <div class="anno-grid">
+
+    <!-- 컴포넌트 -->
+    <div class="anno-card" style="--card-accent: #6adb6a;">
+      <div class="anno-group-label">컴포넌트 & Bean</div>
+      <div class="anno-item"><div class="anno-name">@Component</div><div class="anno-desc">일반 빈 등록 (기타 컴포넌트)</div></div>
+      <div class="anno-item"><div class="anno-name">@Service</div><div class="anno-desc">서비스 레이어 Bean 등록</div></div>
+      <div class="anno-item"><div class="anno-name">@Repository</div><div class="anno-desc">DAO 계층, 예외 변환 자동 처리</div></div>
+      <div class="anno-item"><div class="anno-name">@Configuration</div><div class="anno-desc">자바 설정 클래스, @Bean 포함</div></div>
+      <div class="anno-item"><div class="anno-name">@Bean</div><div class="anno-desc">메서드가 반환하는 객체를 Bean으로 등록</div></div>
+    </div>
+
+    <!-- 웹 MVC -->
+    <div class="anno-card" style="--card-accent: #f72585;">
+      <div class="anno-group-label">Web MVC</div>
+      <div class="anno-item"><div class="anno-name">@Controller</div><div class="anno-desc">MVC 컨트롤러 (View 반환)</div></div>
+      <div class="anno-item"><div class="anno-name">@RestController</div><div class="anno-desc">@Controller + @ResponseBody</div></div>
+      <div class="anno-item"><div class="anno-name">@RequestMapping</div><div class="anno-desc">URL 매핑 (클래스/메서드 레벨)</div></div>
+      <div class="anno-item"><div class="anno-name">@GetMapping</div><div class="anno-desc">GET 요청 매핑 (+ Post/Put/Delete)</div></div>
+      <div class="anno-item"><div class="anno-name">@PathVariable</div><div class="anno-desc">URL 경로 변수 바인딩 {id}</div></div>
+      <div class="anno-item"><div class="anno-name">@RequestBody</div><div class="anno-desc">HTTP Body → 객체 역직렬화</div></div>
+      <div class="anno-item"><div class="anno-name">@ResponseBody</div><div class="anno-desc">객체 → HTTP Body 직렬화</div></div>
+    </div>
+
+    <!-- DI & 트랜잭션 -->
+    <div class="anno-card" style="--card-accent: #00b4d8;">
+      <div class="anno-group-label">DI & 트랜잭션</div>
+      <div class="anno-item"><div class="anno-name">@Autowired</div><div class="anno-desc">타입 기반 자동 의존성 주입</div></div>
+      <div class="anno-item"><div class="anno-name">@Qualifier</div><div class="anno-desc">동일 타입 Bean 구분 (이름 지정)</div></div>
+      <div class="anno-item"><div class="anno-name">@Primary</div><div class="anno-desc">여러 Bean 중 우선순위 지정</div></div>
+      <div class="anno-item"><div class="anno-name">@Value</div><div class="anno-desc">프로퍼티 값 주입 (application.yml)</div></div>
+      <div class="anno-item"><div class="anno-name">@Transactional</div><div class="anno-desc">트랜잭션 경계 설정 (ACID 보장)</div></div>
+    </div>
+
+    <!-- Spring Boot -->
+    <div class="anno-card" style="--card-accent: #ffd60a;">
+      <div class="anno-group-label">Spring Boot & JPA</div>
+      <div class="anno-item"><div class="anno-name">@SpringBootApplication</div><div class="anno-desc">자동 설정 + 컴포넌트 스캔 + 설정 클래스</div></div>
+      <div class="anno-item"><div class="anno-name">@Entity</div><div class="anno-desc">JPA 엔티티 클래스 지정</div></div>
+      <div class="anno-item"><div class="anno-name">@Id / @Column</div><div class="anno-desc">PK 지정 / 컬럼 매핑</div></div>
+      <div class="anno-item"><div class="anno-name">@OneToMany</div><div class="anno-desc">1:N 연관관계 매핑</div></div>
+      <div class="anno-item"><div class="anno-name">@ManyToOne</div><div class="anno-desc">N:1 연관관계 매핑</div></div>
+      <div class="anno-item"><div class="anno-name">@ExceptionHandler</div><div class="anno-desc">컨트롤러 예외 처리 메서드</div></div>
+    </div>
+
+  </div>
+
+  <!-- ⑤ 트랜잭션 -->
+  <div class="section-title">트랜잭션 흐름 (@Transactional)</div>
+  <div class="two-col">
+    <div class="inner-card">
+      <div class="inner-title">// COMMIT 흐름</div>
+      <div class="tx-flow">
+        <div class="tx-step tx-neutral"><div class="tx-num">1</div><div class="tx-text">트랜잭션 시작 (BEGIN)</div></div>
+        <div class="tx-step tx-neutral"><div class="tx-num">2</div><div class="tx-text">Service 메서드 실행</div></div>
+        <div class="tx-step tx-neutral"><div class="tx-num">3</div><div class="tx-text">Repository → DB 쓰기</div></div>
+        <div class="tx-step tx-commit"><div class="tx-num">4</div><div class="tx-text">정상 완료 → COMMIT</div><span class="tx-tag tag-ok">✓ 확정</span></div>
+      </div>
+    </div>
+    <div class="inner-card">
+      <div class="inner-title">// ROLLBACK 흐름</div>
+      <div class="tx-flow">
+        <div class="tx-step tx-neutral"><div class="tx-num">1</div><div class="tx-text">트랜잭션 시작 (BEGIN)</div></div>
+        <div class="tx-step tx-neutral"><div class="tx-num">2</div><div class="tx-text">Service 메서드 실행</div></div>
+        <div class="tx-step tx-rollback"><div class="tx-num">3</div><div class="tx-text">RuntimeException 발생</div><span class="tx-tag tag-fail">✗ 예외</span></div>
+        <div class="tx-step tx-rollback"><div class="tx-num">4</div><div class="tx-text">자동 ROLLBACK</div><span class="tx-tag tag-fail">↩ 취소</span></div>
+      </div>
+      <div style="margin-top:10px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:11px; color:var(--muted); line-height:1.7;">
+        ⚠️ Checked Exception은 기본적으로 Rollback 안됨<br>
+        → <span style="color:var(--accent3); font-family:'JetBrains Mono',monospace;">rollbackFor = Exception.class</span> 설정 필요
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ⑥ QA -->
+  <div class="section-title">단골 면접 질문 & 모범 답변</div>
+  <div class="qa-list">
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.01</span>
+        Spring IoC / DI 란 무엇인가요?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"IoC(제어의 역전)는 객체의 생성과 생명주기 관리를 개발자가 아닌 Spring 컨테이너가 담당하는 것입니다.</span><br>
+        DI(의존성 주입)는 IoC를 구현하는 방법으로, 컨테이너가 필요한 의존 객체를 외부에서 주입해줍니다.<br>
+        생성자 주입을 권장하는 이유는 불변성 보장, 테스트 용이성, 순환 의존성 컴파일 타임 감지 때문입니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.02</span>
+        @Controller vs @RestController 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"@Controller는 View 이름을 반환해 ViewResolver를 통해 HTML 페이지를 렌더링합니다.</span><br>
+        @RestController는 @Controller + @ResponseBody의 합성 어노테이션으로,<br>
+        반환 값을 JSON/XML로 직렬화하여 HTTP 응답 바디에 직접 씁니다. REST API 개발에 사용합니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.03</span>
+        Bean의 스코프(Scope) 종류는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"기본값인 Singleton은 컨테이너당 인스턴스 하나를 공유합니다.</span><br>
+        Prototype은 요청할 때마다 새 인스턴스를 생성합니다.<br>
+        웹 스코프로는 Request(HTTP 요청마다), Session(세션마다), Application(서블릿 컨텍스트마다)이 있습니다.<br>
+        <span class="hl2">Singleton Bean에 Prototype Bean을 주입할 때는 Proxy 처리가 필요합니다.</span>"
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.04</span>
+        @Transactional 동작 원리는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Spring AOP 프록시를 통해 동작합니다. 메서드 호출 전 트랜잭션을 시작(BEGIN)하고,</span><br>
+        정상 완료 시 COMMIT, RuntimeException 발생 시 ROLLBACK합니다.<br>
+        같은 클래스 내부에서 @Transactional 메서드를 self-invoke하면 프록시를 거치지 않아 트랜잭션이 적용되지 않습니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.05</span>
+        Filter vs Interceptor vs AOP 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Filter는 서블릿 컨테이너 레벨에서 동작해 Spring 영역 밖(인코딩, CORS, 인증 전처리)에 사용합니다.</span><br>
+        Interceptor는 DispatcherServlet과 Controller 사이에서 동작하며 HandlerMethod 정보를 활용할 수 있습니다.<br>
+        AOP는 메서드 레벨에서 동작해 비즈니스 로직 전후(로깅, 트랜잭션)에 사용합니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.06</span>
+        JPA N+1 문제란?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"1번의 쿼리로 N개의 엔티티를 조회한 후, 연관 엔티티를 로딩하기 위해 N번의 추가 쿼리가 발생하는 문제입니다.</span><br>
+        예: 게시글 10개 조회(1) → 각 게시글의 작성자 조회(10) = 총 11번 쿼리<br>
+        해결 방법: <span class="hl2">Fetch Join</span> (JPQL), <span class="hl2">@EntityGraph</span>, <span class="hl2">Batch Size</span> 설정으로 해결합니다."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ⑦ 루틴 -->
+  <div class="section-title">3일 암기 루틴</div>
+  <div class="routine">
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--spring);">DAY 1</div>
+      <div class="routine-label">구조 이해</div>
+      <div class="routine-task">MVC 흐름 · 계층 구조<br>손으로 직접<br><strong>다이어그램 그리기</strong></div>
+    </div>
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--accent3);">DAY 2</div>
+      <div class="routine-label">어노테이션 암기</div>
+      <div class="routine-task">핵심 어노테이션<br>역할을 보지 않고<br><strong>설명해 보기</strong></div>
+    </div>
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--accent2);">DAY 3</div>
+      <div class="routine-label">답변 연습</div>
+      <div class="routine-task">단골 질문 6개<br>소리 내어<br><strong>1분 안에 답변</strong></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>// SPRING FRAMEWORK INTERVIEW CHEATSHEET &nbsp;·&nbsp; GOOD LUCK 🚀</footer>
+
+<script>
+  function toggle(el) { el.classList.toggle('open'); }
+</script>
+</body>
+</html>

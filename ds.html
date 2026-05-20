@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자료구조 면접 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent1) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  /* Section */
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent3), transparent);
+    opacity: 0.3;
+  }
+
+  /* DS Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--card-accent);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--card-accent) 15%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--card-accent);
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Visual */
+  .visual {
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .box {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid var(--card-accent);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 8%, transparent);
+    flex-shrink: 0;
+  }
+
+  .box.filled {
+    background: color-mix(in srgb, var(--card-accent) 25%, transparent);
+  }
+
+  .arrow {
+    color: var(--muted);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 8%, transparent);
+  }
+
+  /* Info rows */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: var(--muted); font-size: 12px; }
+  .info-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .use-case {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .use-case strong {
+    color: var(--card-accent);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Complexity Table */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    background: rgba(0,245,212,0.05);
+    padding: 14px 20px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent1);
+    font-weight: 700;
+  }
+
+  .o-fast { color: #00f5d4; }
+  .o-mid  { color: #ffd60a; }
+  .o-slow { color: #f72585; }
+
+  /* QA Section */
+  .qa-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+
+  .qa-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .qa-item:hover { border-color: #333350; }
+  .qa-item.open { border-color: var(--accent2); }
+
+  .qa-q {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .qa-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent2) 20%, transparent);
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .qa-chevron {
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform 0.3s ease;
+    font-size: 12px;
+  }
+  .qa-item.open .qa-chevron { transform: rotate(180deg); }
+
+  .qa-a {
+    display: none;
+    padding: 0 20px 16px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .qa-item.open .qa-a { display: block; }
+
+  .qa-a .highlight {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent1);
+    font-size: 12px;
+  }
+
+  /* Routine box */
+  .routine {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  @media (max-width: 600px) {
+    .routine { grid-template-columns: 1fr; }
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+
+  .routine-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .routine-day {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .routine-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  .routine-task {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Linked list node visual */
+  .node-visual {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+
+  .node {
+    display: flex;
+    border: 1.5px solid var(--card-accent);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .node-data {
+    width: 28px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 15%, transparent);
+  }
+
+  .node-ptr {
+    width: 20px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: var(--muted);
+    border-left: 1px solid color-mix(in srgb, var(--card-accent) 30%, transparent);
+  }
+
+  /* Tree visual */
+  .tree-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .tree-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tree-node {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--card-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 10%, transparent);
+    flex-shrink: 0;
+  }
+
+  .tree-node.root {
+    background: color-mix(in srgb, var(--card-accent) 30%, transparent);
+    font-weight: 700;
+  }
+
+  .tree-spacer { width: 32px; }
+
+  /* Stack visual */
+  .stack-visual {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .stack-item {
+    width: 100px;
+    height: 28px;
+    border: 1.5px solid var(--card-accent);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 8%, transparent);
+    position: relative;
+  }
+
+  .stack-item.top-item {
+    background: color-mix(in srgb, var(--card-accent) 25%, transparent);
+  }
+
+  .top-label {
+    position: absolute;
+    right: -42px;
+    font-size: 9px;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Hash visual */
+  .hash-visual {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hash-input {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hash-key {
+    padding: 4px 8px;
+    background: color-mix(in srgb, var(--card-accent) 15%, transparent);
+    border: 1px solid var(--card-accent);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--card-accent);
+  }
+
+  .hash-fn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 70px;
+    font-size: 20px;
+    color: var(--accent3);
+  }
+
+  .hash-buckets {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hash-bucket {
+    height: 22px;
+    width: 70px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .hash-bucket.filled {
+    border-color: var(--card-accent);
+    color: var(--card-accent);
+    background: color-mix(in srgb, var(--card-accent) 8%, transparent);
+  }
+
+  /* Graph visual */
+  .graph-visual svg {
+    width: 180px;
+    height: 90px;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.2s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+  .card:nth-child(6) { animation-delay: 0.3s; }
+  .card:nth-child(7) { animation-delay: 0.35s; }
+  .card:nth-child(8) { animation-delay: 0.4s; }
+  .qa-item:nth-child(1) { animation-delay: 0.05s; }
+  .qa-item:nth-child(2) { animation-delay: 0.1s; }
+  .qa-item:nth-child(3) { animation-delay: 0.15s; }
+  .qa-item:nth-child(4) { animation-delay: 0.2s; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="label">// INTERVIEW PREP 2024</div>
+    <h1>자료구조<br>면접 치트시트</h1>
+    <p class="subtitle">암기용 핵심 정리 — 정의 · 복잡도 · 사용 사례</p>
+  </header>
+
+  <!-- DS Cards -->
+  <div class="section-title">자료구조 카드</div>
+  <div class="cards-grid">
+
+    <!-- Array -->
+    <div class="card" style="--card-accent: #00f5d4;">
+      <div class="card-header">
+        <div class="card-icon">▦</div>
+        <div>
+          <div class="card-name">Array</div>
+          <div class="card-sub">배열</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="box filled">1</div>
+        <div class="box filled">2</div>
+        <div class="box filled">3</div>
+        <div class="box filled">4</div>
+        <div class="box">5</div>
+      </div>
+      <div class="tags">
+        <span class="tag">연속 메모리</span>
+        <span class="tag">인덱스 접근</span>
+        <span class="tag">고정 크기</span>
+      </div>
+      <div class="info-row"><span class="info-key">정의</span><span class="info-val">연속된 메모리에 데이터 저장</span></div>
+      <div class="info-row"><span class="info-key">탐색</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="info-row"><span class="info-key">삽입/삭제</span><span class="info-val o-slow">O(n)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>순서 있는 데이터, 크기 고정, 빠른 인덱스 접근 필요 시</div>
+    </div>
+
+    <!-- Linked List -->
+    <div class="card" style="--card-accent: #7209b7;">
+      <div class="card-header">
+        <div class="card-icon">⛓</div>
+        <div>
+          <div class="card-name">Linked List</div>
+          <div class="card-sub">연결 리스트</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="node-visual">
+          <div class="node"><div class="node-data">A</div><div class="node-ptr">→</div></div>
+          <div class="node"><div class="node-data">B</div><div class="node-ptr">→</div></div>
+          <div class="node"><div class="node-data">C</div><div class="node-ptr">∅</div></div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">포인터 연결</span>
+        <span class="tag">동적 크기</span>
+        <span class="tag">비연속 메모리</span>
+      </div>
+      <div class="info-row"><span class="info-key">정의</span><span class="info-val">노드가 포인터로 연결된 구조</span></div>
+      <div class="info-row"><span class="info-key">탐색</span><span class="info-val o-slow">O(n)</span></div>
+      <div class="info-row"><span class="info-key">삽입/삭제</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>삽입/삭제 빈번, 크기 동적으로 변할 때</div>
+    </div>
+
+    <!-- Stack -->
+    <div class="card" style="--card-accent: #f72585;">
+      <div class="card-header">
+        <div class="card-icon">↑</div>
+        <div>
+          <div class="card-name">Stack</div>
+          <div class="card-sub">LIFO — 후입선출</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="stack-visual">
+          <div class="stack-item">바닥</div>
+          <div class="stack-item">중간</div>
+          <div class="stack-item top-item">TOP <span class="top-label">← TOP</span></div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">LIFO</span>
+        <span class="tag">push/pop</span>
+      </div>
+      <div class="info-row"><span class="info-key">정의</span><span class="info-val">마지막에 넣은 것이 먼저 나옴</span></div>
+      <div class="info-row"><span class="info-key">삽입(push)</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="info-row"><span class="info-key">삭제(pop)</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>함수 호출 스택, 괄호 유효성 검사, 뒤로가기</div>
+    </div>
+
+    <!-- Queue -->
+    <div class="card" style="--card-accent: #ffd60a;">
+      <div class="card-header">
+        <div class="card-icon">→</div>
+        <div>
+          <div class="card-name">Queue</div>
+          <div class="card-sub">FIFO — 선입선출</div>
+        </div>
+      </div>
+      <div class="visual">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent3);">IN →</span>
+        <div class="box">A</div>
+        <div class="box filled">B</div>
+        <div class="box filled">C</div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent3);">→ OUT</span>
+      </div>
+      <div class="tags">
+        <span class="tag">FIFO</span>
+        <span class="tag">enqueue/dequeue</span>
+      </div>
+      <div class="info-row"><span class="info-key">정의</span><span class="info-val">먼저 넣은 것이 먼저 나옴</span></div>
+      <div class="info-row"><span class="info-key">삽입(enqueue)</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="info-row"><span class="info-key">삭제(dequeue)</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>프린터 대기열, BFS 탐색, 작업 스케줄링</div>
+    </div>
+
+    <!-- Hash Table -->
+    <div class="card" style="--card-accent: #4cc9f0;">
+      <div class="card-header">
+        <div class="card-icon">#</div>
+        <div>
+          <div class="card-name">Hash Table</div>
+          <div class="card-sub">해시 테이블</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="hash-visual">
+          <div class="hash-input">
+            <div class="hash-key">"name"</div>
+            <div class="hash-key">"age"</div>
+          </div>
+          <div class="hash-fn">⚙</div>
+          <div class="hash-buckets">
+            <div class="hash-bucket">[ 0 ]</div>
+            <div class="hash-bucket filled">[ 1 ] Kim</div>
+            <div class="hash-bucket">[ 2 ]</div>
+            <div class="hash-bucket filled">[ 3 ] 25</div>
+          </div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">Key-Value</span>
+        <span class="tag">해시 함수</span>
+        <span class="tag">충돌 처리</span>
+      </div>
+      <div class="info-row"><span class="info-key">탐색/삽입/삭제 (평균)</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="info-row"><span class="info-key">최악</span><span class="info-val o-slow">O(n)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>빠른 탐색 필요 시, 딕셔너리, 캐싱, 중복 제거</div>
+    </div>
+
+    <!-- BST -->
+    <div class="card" style="--card-accent: #80ffdb;">
+      <div class="card-header">
+        <div class="card-icon">🌲</div>
+        <div>
+          <div class="card-name">BST</div>
+          <div class="card-sub">이진 탐색 트리</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="tree-visual">
+          <div class="tree-row"><div class="tree-node root">5</div></div>
+          <div class="tree-row">
+            <div class="tree-node">3</div>
+            <div class="tree-spacer"></div>
+            <div class="tree-node">8</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">1</div>
+            <div class="tree-node">4</div>
+            <div class="tree-node">7</div>
+            <div class="tree-node">9</div>
+          </div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">왼쪽 < 부모 < 오른쪽</span>
+        <span class="tag">재귀</span>
+      </div>
+      <div class="info-row"><span class="info-key">탐색/삽입/삭제 (평균)</span><span class="info-val o-mid">O(log n)</span></div>
+      <div class="info-row"><span class="info-key">최악 (편향 트리)</span><span class="info-val o-slow">O(n)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>정렬된 데이터 탐색, 범위 검색</div>
+    </div>
+
+    <!-- Heap -->
+    <div class="card" style="--card-accent: #ff9f1c;">
+      <div class="card-header">
+        <div class="card-icon">⛰</div>
+        <div>
+          <div class="card-name">Heap</div>
+          <div class="card-sub">Max / Min Heap</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="tree-visual">
+          <div class="tree-row"><div class="tree-node root">9</div></div>
+          <div class="tree-row">
+            <div class="tree-node">7</div>
+            <div class="tree-spacer"></div>
+            <div class="tree-node">6</div>
+          </div>
+          <div class="tree-row">
+            <div class="tree-node">3</div>
+            <div class="tree-node">5</div>
+            <div class="tree-node">4</div>
+            <div class="tree-node">2</div>
+          </div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">완전 이진 트리</span>
+        <span class="tag">부모 > 자식</span>
+      </div>
+      <div class="info-row"><span class="info-key">삽입/삭제</span><span class="info-val o-mid">O(log n)</span></div>
+      <div class="info-row"><span class="info-key">최댓값 조회</span><span class="info-val o-fast">O(1)</span></div>
+      <div class="use-case"><strong>사용 사례</strong>우선순위 큐, 최댓값/최솟값 빠른 추출, Heap Sort</div>
+    </div>
+
+    <!-- Graph -->
+    <div class="card" style="--card-accent: #c77dff;">
+      <div class="card-header">
+        <div class="card-icon">◎</div>
+        <div>
+          <div class="card-name">Graph</div>
+          <div class="card-sub">그래프</div>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="graph-visual">
+          <svg viewBox="0 0 180 90">
+            <line x1="40" y1="45" x2="90" y2="20" stroke="#c77dff" stroke-width="1.5" opacity="0.6"/>
+            <line x1="40" y1="45" x2="90" y2="70" stroke="#c77dff" stroke-width="1.5" opacity="0.6"/>
+            <line x1="90" y1="20" x2="140" y2="45" stroke="#c77dff" stroke-width="1.5" opacity="0.6"/>
+            <line x1="90" y1="70" x2="140" y2="45" stroke="#c77dff" stroke-width="1.5" opacity="0.6"/>
+            <line x1="90" y1="20" x2="90" y2="70" stroke="#c77dff" stroke-width="1.5" opacity="0.3"/>
+            <circle cx="40" cy="45" r="12" fill="rgba(199,125,255,0.15)" stroke="#c77dff" stroke-width="1.5"/>
+            <circle cx="90" cy="20" r="12" fill="rgba(199,125,255,0.15)" stroke="#c77dff" stroke-width="1.5"/>
+            <circle cx="90" cy="70" r="12" fill="rgba(199,125,255,0.15)" stroke="#c77dff" stroke-width="1.5"/>
+            <circle cx="140" cy="45" r="12" fill="rgba(199,125,255,0.25)" stroke="#c77dff" stroke-width="1.5"/>
+            <text x="40" y="49" text-anchor="middle" fill="#c77dff" font-size="10" font-family="monospace">A</text>
+            <text x="90" y="24" text-anchor="middle" fill="#c77dff" font-size="10" font-family="monospace">B</text>
+            <text x="90" y="74" text-anchor="middle" fill="#c77dff" font-size="10" font-family="monospace">C</text>
+            <text x="140" y="49" text-anchor="middle" fill="#c77dff" font-size="10" font-family="monospace">D</text>
+          </svg>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">노드 + 간선</span>
+        <span class="tag">DFS</span>
+        <span class="tag">BFS</span>
+      </div>
+      <div class="info-row"><span class="info-key">탐색 (BFS/DFS)</span><span class="info-val o-mid">O(V + E)</span></div>
+      <div class="info-row"><span class="info-key">표현 방식</span><span class="info-val">인접 행렬 / 인접 리스트</span></div>
+      <div class="use-case"><strong>사용 사례</strong>SNS 친구 관계, 지도 경로 탐색, 네트워크</div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Complexity Table -->
+  <div class="section-title">시간복잡도 비교표</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>자료구조</th>
+          <th>탐색</th>
+          <th>삽입</th>
+          <th>삭제</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Array</td><td class="o-fast">O(1)</td><td class="o-slow">O(n)</td><td class="o-slow">O(n)</td><td style="color: var(--muted); font-size:12px;">인덱스 직접 접근</td></tr>
+        <tr><td>Linked List</td><td class="o-slow">O(n)</td><td class="o-fast">O(1)</td><td class="o-fast">O(1)</td><td style="color: var(--muted); font-size:12px;">포인터 기반</td></tr>
+        <tr><td>Stack / Queue</td><td>—</td><td class="o-fast">O(1)</td><td class="o-fast">O(1)</td><td style="color: var(--muted); font-size:12px;">LIFO / FIFO</td></tr>
+        <tr><td>Hash Table</td><td class="o-fast">O(1)*</td><td class="o-fast">O(1)*</td><td class="o-fast">O(1)*</td><td style="color: var(--muted); font-size:12px;">*평균, 최악 O(n)</td></tr>
+        <tr><td>BST</td><td class="o-mid">O(log n)*</td><td class="o-mid">O(log n)*</td><td class="o-mid">O(log n)*</td><td style="color: var(--muted); font-size:12px;">*평균, 편향 시 O(n)</td></tr>
+        <tr><td>Heap</td><td class="o-fast">O(1)**</td><td class="o-mid">O(log n)</td><td class="o-mid">O(log n)</td><td style="color: var(--muted); font-size:12px;">**최댓값/최솟값만</td></tr>
+        <tr><td>Graph (BFS/DFS)</td><td class="o-mid">O(V+E)</td><td>—</td><td>—</td><td style="color: var(--muted); font-size:12px;">V=노드 E=간선</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- QA -->
+  <div class="section-title">단골 질문 & 모범 답변</div>
+  <div class="qa-list">
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.01</span>
+        Array vs Linked List 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="highlight">"Array는 인덱스로 O(1) 탐색이 가능하지만 삽입/삭제가 O(n)입니다.</span><br>
+        Linked List는 반대로 삽입/삭제가 O(1)이지만 탐색이 O(n)입니다.<br>
+        데이터 접근이 많으면 Array, 삽입/삭제가 많으면 Linked List를 선택합니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.02</span>
+        Hash Collision(충돌) 해결 방법은?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="highlight">"Chaining과 Open Addressing이 있습니다.</span><br>
+        Chaining은 같은 버킷에 Linked List로 이어서 저장하고,<br>
+        Open Addressing은 빈 버킷을 찾아 저장하는 방식입니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.03</span>
+        BST 최악의 경우는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="highlight">"데이터가 이미 정렬된 순서로 삽입되면 트리가 한쪽으로 치우쳐 O(n)이 됩니다.</span><br>
+        이를 방지하기 위해 AVL Tree나 Red-Black Tree 같은 균형 트리를 사용합니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.04</span>
+        DFS vs BFS 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="highlight">"DFS는 스택/재귀로 깊이 우선 탐색, BFS는 큐로 너비 우선 탐색합니다.</span><br>
+        최단 경로는 BFS, 경로 존재 여부나 백트래킹은 DFS를 사용합니다."
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.05</span>
+        Stack으로 Queue를 구현하려면?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="highlight">"Stack 두 개를 사용합니다. (inbox / outbox)</span><br>
+        삽입 시 inbox에 push하고, 꺼낼 때 outbox가 비어 있으면 inbox를 전부 outbox로 옮긴 뒤 pop합니다.<br>
+        이렇게 하면 FIFO 순서를 보장할 수 있습니다."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Routine -->
+  <div class="section-title">3일 암기 루틴</div>
+  <div class="routine">
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--accent1);">DAY 1</div>
+      <div class="routine-label">전체 훑기</div>
+      <div class="routine-task">이 페이지를<br>처음부터 끝까지<br><strong>3번 읽기</strong></div>
+    </div>
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--accent3);">DAY 2</div>
+      <div class="routine-label">암기 확인</div>
+      <div class="routine-task">페이지 보지 않고<br>각 자료구조<br><strong>3가지 말해보기</strong></div>
+    </div>
+    <div class="routine-item">
+      <div class="routine-day" style="color: var(--accent2);">DAY 3</div>
+      <div class="routine-label">실전 연습</div>
+      <div class="routine-task">단골 질문<br>소리 내어<br><strong>답변 연습</strong></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>// DATA STRUCTURES INTERVIEW CHEATSHEET &nbsp;·&nbsp; GOOD LUCK 🚀</footer>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
