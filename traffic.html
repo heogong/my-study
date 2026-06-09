@@ -464,6 +464,48 @@
     .grid-2 { grid-template-columns: 1fr; }
     .grid-3 { grid-template-columns: 1fr; }
   }
+
+  /* Architecture Diagram */
+  .arch-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .arch-tab-btn {
+    flex: 1; min-width: 120px;
+    padding: 14px 10px;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 8px;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    transition: all 0.2s;
+  }
+  .arch-tab-btn .atb-rps { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--muted); transition: color 0.2s; }
+  .arch-tab-btn .atb-unit { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+  .arch-tab-btn .atb-name { font-size: 11px; color: var(--muted); transition: color 0.2s; margin-top: 2px; }
+  .arch-tab-btn.active { border-color: var(--atb-c); background: color-mix(in srgb, var(--atb-c) 8%, transparent); }
+  .arch-tab-btn.active .atb-rps, .arch-tab-btn.active .atb-name { color: var(--atb-c); }
+  .arch-tab-btn:hover:not(.active) { border-color: rgba(255,255,255,0.08); }
+
+  .arch-panel { display: none; }
+  .arch-panel.active { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; }
+  @media (max-width: 900px) { .arch-panel.active { grid-template-columns: 1fr; } }
+
+  .arch-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .arch-lyr {
+    width: 100%; border-radius: 8px; padding: 12px;
+    border: 1px solid var(--al-c, var(--border));
+    background: color-mix(in srgb, var(--al-c, #ffffff) 5%, transparent);
+  }
+  .arch-lyr-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--al-c, var(--muted)); margin-bottom: 8px; display: block; }
+  .arch-nodes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .an {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 12px; border-radius: 6px; min-width: 78px; text-align: center;
+    border: 1.5px solid var(--an-c, var(--border));
+    background: color-mix(in srgb, var(--an-c, var(--border)) 10%, transparent);
+  }
+  .an em { font-size: 16px; font-style: normal; display: block; }
+  .an strong { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--an-c); display: block; white-space: nowrap; }
+  .an span { font-size: 9px; color: var(--muted); white-space: nowrap; display: block; }
+  .arch-arrow { display: flex; flex-direction: column; align-items: center; padding: 3px 0; gap: 1px; }
+  .arch-arrow-line { width: 1.5px; height: 14px; background: var(--border); }
+  .arch-arrow-head { color: var(--muted); font-size: 10px; line-height: 1; }
+  .arch-arrow-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -568,6 +610,321 @@
 
     <div class="memo">
       <strong>핵심 원칙:</strong> 트래픽 규모에 맞는 복잡도를 선택해야 한다. 100 RPS 서비스에 MSA를 도입하면 운영 복잡도만 증가한다. 병목 지점을 측정(APM, 프로파일링)하고 점진적으로 확장하라.
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────
+       SECTION 11: 규모별 아키텍처 구조도
+  ───────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div class="section-title">규모별 아키텍처 구조도</div>
+      <span class="section-tag tag-green">Architecture Diagrams</span>
+    </div>
+
+    <!-- Tier Selector Tabs -->
+    <div class="arch-tabs">
+      <button class="arch-tab-btn active" style="--atb-c: var(--accent1)" onclick="switchTier(1)">
+        <span class="atb-rps">~1K</span>
+        <span class="atb-unit">RPS</span>
+        <span class="atb-name">스타트업</span>
+      </button>
+      <button class="arch-tab-btn" style="--atb-c: var(--accent3)" onclick="switchTier(2)">
+        <span class="atb-rps">~10K</span>
+        <span class="atb-unit">RPS</span>
+        <span class="atb-name">성장기</span>
+      </button>
+      <button class="arch-tab-btn" style="--atb-c: var(--accent2)" onclick="switchTier(3)">
+        <span class="atb-rps">~100K</span>
+        <span class="atb-unit">RPS</span>
+        <span class="atb-name">스케일업</span>
+      </button>
+      <button class="arch-tab-btn" style="--atb-c: #c77dff" onclick="switchTier(4)">
+        <span class="atb-rps">1M+</span>
+        <span class="atb-unit">RPS</span>
+        <span class="atb-name">글로벌</span>
+      </button>
+    </div>
+
+    <!-- ── Tier 1: ~1K RPS ── -->
+    <div class="arch-panel active" id="arch-panel-1">
+      <div class="card-full c-green" style="padding: 20px;">
+        <div class="slabel" style="margin-bottom: 14px;">단일 서버 아키텍처 (Single Server)</div>
+        <div class="arch-diagram">
+          <div class="arch-lyr" style="--al-c: #4cc9f0">
+            <span class="arch-lyr-label">Client</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #4cc9f0"><em>🌐</em><strong>Browser</strong><span>Web App</span></div>
+              <div class="an" style="--an-c: #4cc9f0"><em>📱</em><strong>Mobile App</strong><span>iOS / Android</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">HTTPS</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent1)">
+            <span class="arch-lyr-label">Network / Reverse Proxy</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent1)"><em>🔄</em><strong>Nginx</strong><span>Reverse Proxy · SSL</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">proxy_pass</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent3)">
+            <span class="arch-lyr-label">Application (단일 인스턴스)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent3)"><em>⚙️</em><strong>Spring Boot</strong><span>단일 서버</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>⚡</em><strong>Caffeine</strong><span>로컬 캐시</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>🔌</em><strong>HikariCP</strong><span>Connection Pool</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">JDBC</div></div>
+          <div class="arch-lyr" style="--al-c: #ff8c42">
+            <span class="arch-lyr-label">Data</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #ff8c42"><em>🗄️</em><strong>MySQL</strong><span>단일 Primary</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card c-green">
+          <div class="card-title">핵심 최적화 포인트</div>
+          <ul class="dot-list">
+            <li><strong>DB 인덱스</strong> — WHERE / JOIN / ORDER BY 컬럼 B-Tree 인덱스</li>
+            <li><strong>쿼리 튜닝</strong> — EXPLAIN으로 Full Scan 제거</li>
+            <li><strong>Connection Pool</strong> — HikariCP <span class="hl g">maximumPoolSize</span> 설정</li>
+            <li><strong>로컬 캐시</strong> — Caffeine으로 반복 조회 데이터 캐싱</li>
+            <li><strong>N+1 문제</strong> — JPA Fetch Join / Batch Size</li>
+          </ul>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">장단점</div>
+          <ul class="dot-list blue">
+            <li>✅ 운영 단순 — 서버 1대, 배포·모니터링 쉬움</li>
+            <li>✅ 비용 최소 — 소규모에 최적화</li>
+            <li>❌ SPOF — 서버/DB 장애 시 전체 다운</li>
+            <li>❌ 수직 확장 한계 — 사양 업그레이드만 가능</li>
+          </ul>
+        </div>
+        <div class="memo">
+          <strong>적합한 시나리오:</strong> MAU 10만 이하, 초당 수백 요청 이하. 작게 시작하고 실제 병목이 나타날 때 점진적으로 확장.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tier 2: ~10K RPS ── -->
+    <div class="arch-panel" id="arch-panel-2">
+      <div class="card-full c-yellow" style="padding: 20px;">
+        <div class="slabel" style="margin-bottom: 14px;">수평 확장 + 캐시 레이어</div>
+        <div class="arch-diagram">
+          <div class="arch-lyr" style="--al-c: #4cc9f0">
+            <span class="arch-lyr-label">Client</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #4cc9f0"><em>👤</em><strong>Client</strong><span>Browser / Mobile</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">DNS Lookup</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent1)">
+            <span class="arch-lyr-label">Network Layer</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent1)"><em>🌐</em><strong>CDN</strong><span>정적 자산 캐시</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>⚖️</em><strong>Load Balancer</strong><span>Nginx / HAProxy</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Round Robin</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent3)">
+            <span class="arch-lyr-label">Application (Stateless × N)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent3)"><em>⚙️</em><strong>App #1</strong><span>Spring Boot</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>⚙️</em><strong>App #2</strong><span>Spring Boot</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>⚙️</em><strong>App #3</strong><span>Spring Boot</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Cache-Aside</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent2)">
+            <span class="arch-lyr-label">Cache Layer</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent2)"><em>⚡</em><strong>Redis</strong><span>분산 캐시</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Read / Write 분리</div></div>
+          <div class="arch-lyr" style="--al-c: #ff8c42">
+            <span class="arch-lyr-label">Data Layer (Read/Write Replica)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent3)"><em>✍️</em><strong>Master DB</strong><span>쓰기 전용</span></div>
+              <div class="an" style="--an-c: var(--accent1)"><em>📖</em><strong>Replica #1</strong><span>읽기 전용</span></div>
+              <div class="an" style="--an-c: var(--accent1)"><em>📖</em><strong>Replica #2</strong><span>읽기 전용</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card c-yellow">
+          <div class="card-title">Tier 1 대비 추가된 것</div>
+          <ul class="dot-list yellow">
+            <li>🆕 <strong>CDN</strong> — 정적 자산 엣지 캐싱, 오리진 부하 ↓</li>
+            <li>🆕 <strong>Load Balancer</strong> — 앱 서버 다중화 · 트래픽 분산</li>
+            <li>🆕 <strong>Redis Cache</strong> — DB 읽기 부하 대폭 감소</li>
+            <li>🆕 <strong>Read Replica</strong> — 읽기 쿼리를 Replica로 분산</li>
+            <li>🔑 <strong>Stateless 전환</strong> — 세션을 Redis로 외부화</li>
+          </ul>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">주의 사항</div>
+          <ul class="dot-list blue">
+            <li>Replica 복제 지연 — 쓰기 직후 읽기는 Master 라우팅</li>
+            <li>Redis 장애 시 DB에 Cache Stampede 위험</li>
+            <li>Sticky Session 금지 — Stateless 설계 필수</li>
+          </ul>
+        </div>
+        <div class="memo blue">
+          <strong>적합한 시나리오:</strong> MAU 100만 이하, 읽기 중심 서비스. 캐시 히트율 80% 이상 목표.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tier 3: ~100K RPS ── -->
+    <div class="arch-panel" id="arch-panel-3">
+      <div class="card-full c-pink" style="padding: 20px;">
+        <div class="slabel" style="margin-bottom: 14px;">MSA + 메시지 큐 + DB 샤딩</div>
+        <div class="arch-diagram">
+          <div class="arch-lyr" style="--al-c: #4cc9f0">
+            <span class="arch-lyr-label">Client</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #4cc9f0"><em>👤</em><strong>Client</strong><span>Browser / Mobile</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent1)">
+            <span class="arch-lyr-label">Network + API Gateway</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent1)"><em>🌐</em><strong>CDN</strong><span>Multi-CDN</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>⚖️</em><strong>Global LB</strong><span>L7 라우팅</span></div>
+              <div class="an" style="--an-c: var(--accent2)"><em>🔐</em><strong>API Gateway</strong><span>Auth · Rate Limit</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Service Discovery</div></div>
+          <div class="arch-lyr" style="--al-c: #c77dff">
+            <span class="arch-lyr-label">MSA (Kubernetes HPA · Circuit Breaker)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #c77dff"><em>👤</em><strong>User SVC</strong><span>×3 인스턴스</span></div>
+              <div class="an" style="--an-c: #c77dff"><em>🛒</em><strong>Order SVC</strong><span>×5 인스턴스</span></div>
+              <div class="an" style="--an-c: #c77dff"><em>📦</em><strong>Product SVC</strong><span>×4 인스턴스</span></div>
+              <div class="an" style="--an-c: #c77dff"><em>🔔</em><strong>Notify SVC</strong><span>×2 인스턴스</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Event Publishing</div></div>
+          <div class="arch-lyr" style="--al-c: #ff8c42">
+            <span class="arch-lyr-label">Message Queue (Async)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #ff8c42"><em>📨</em><strong>Kafka</strong><span>이벤트 스트리밍</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent2)">
+            <span class="arch-lyr-label">Cache + Data (Sharding)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent2)"><em>⚡</em><strong>Redis Cluster</strong><span>16384 슬롯</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>🗄️</em><strong>Shard 1</strong><span>user 0~33%</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>🗄️</em><strong>Shard 2</strong><span>user 33~66%</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>🗄️</em><strong>Shard 3</strong><span>user 66~100%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card c-pink">
+          <div class="card-title">Tier 2 대비 추가된 것</div>
+          <ul class="dot-list pink">
+            <li>🆕 <strong>MSA 전환</strong> — 서비스별 독립 배포 · 확장</li>
+            <li>🆕 <strong>Kafka</strong> — 비동기 처리, 버스트 트래픽 흡수</li>
+            <li>🆕 <strong>DB 샤딩</strong> — 데이터 수평 분산 (해시 키)</li>
+            <li>🆕 <strong>Kubernetes HPA</strong> — 메트릭 기반 오토 스케일링</li>
+            <li>🆕 <strong>Circuit Breaker</strong> — 장애 격리 (Resilience4j)</li>
+            <li>🆕 <strong>Service Mesh</strong> — Istio mTLS · 분산 트레이싱</li>
+          </ul>
+        </div>
+        <div class="card c-orange">
+          <div class="card-title">MSA 도입 트레이드오프</div>
+          <ul class="dot-list orange">
+            <li>✅ 서비스별 독립 확장 · 배포</li>
+            <li>✅ 장애 격리 — Circuit Breaker</li>
+            <li>❌ 분산 트랜잭션 복잡도 ↑ (SAGA)</li>
+            <li>❌ 네트워크 레이턴시 증가</li>
+            <li>❌ 운영 복잡도 폭증 (Observability 필수)</li>
+          </ul>
+        </div>
+        <div class="memo pink">
+          <strong>적합한 시나리오:</strong> 팀 규모 50명+, 도메인 경계가 명확할 때. 모놀리스에서 충분히 성장 후 분리.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tier 4: 1M+ RPS ── -->
+    <div class="arch-panel" id="arch-panel-4">
+      <div class="card-full" style="padding: 20px; border-color: rgba(199,125,255,0.3); background: rgba(199,125,255,0.03); position: relative; overflow: hidden; border-radius: 8px;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #c77dff, transparent);"></div>
+        <div class="slabel" style="margin-bottom: 14px;">글로벌 분산 + 다중 리전</div>
+        <div class="arch-diagram">
+          <div class="arch-lyr" style="--al-c: #4cc9f0">
+            <span class="arch-lyr-label">Global Users</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #4cc9f0"><em>🌏</em><strong>Asia Users</strong></div>
+              <div class="an" style="--an-c: #4cc9f0"><em>🌎</em><strong>US Users</strong></div>
+              <div class="an" style="--an-c: #4cc9f0"><em>🌍</em><strong>EU Users</strong></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Anycast DNS</div></div>
+          <div class="arch-lyr" style="--al-c: #c77dff">
+            <span class="arch-lyr-label">Global Load Balancing</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #c77dff"><em>🌐</em><strong>Anycast / GeoDNS</strong><span>최근접 리전 라우팅</span></div>
+              <div class="an" style="--an-c: #c77dff"><em>🛡️</em><strong>DDoS Protection</strong><span>Cloudflare / Shield</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Route to Nearest Region</div></div>
+          <div class="arch-lyr" style="--al-c: var(--accent1)">
+            <span class="arch-lyr-label">Multi-Region Clusters (Each: CDN → LB → App → Cache → DB)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: var(--accent1)"><em>🌏</em><strong>Asia Region</strong><span>ap-northeast-1</span></div>
+              <div class="an" style="--an-c: var(--accent3)"><em>🌎</em><strong>US Region</strong><span>us-east-1</span></div>
+              <div class="an" style="--an-c: var(--accent2)"><em>🌍</em><strong>EU Region</strong><span>eu-west-1</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow"><div class="arch-arrow-line"></div><div class="arch-arrow-head">▼</div><div class="arch-arrow-lbl">Async Cross-Region Replication</div></div>
+          <div class="arch-lyr" style="--al-c: #ff8c42">
+            <span class="arch-lyr-label">Cross-Region Data Sync (Eventual Consistency)</span>
+            <div class="arch-nodes">
+              <div class="an" style="--an-c: #ff8c42"><em>🔄</em><strong>Multi-Master</strong><span>Cassandra / Spanner</span></div>
+              <div class="an" style="--an-c: #ff8c42"><em>📊</em><strong>MirrorMaker 2</strong><span>Kafka 리전 간 복제</span></div>
+              <div class="an" style="--an-c: #ff8c42"><em>⏱️</em><strong>Eventual Consistency</strong><span>최종 일관성 허용</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card c-purple">
+          <div class="card-title">Tier 3 대비 추가된 것</div>
+          <ul class="dot-list purple">
+            <li>🆕 <strong>멀티 리전</strong> — 지역별 완전 독립 스택</li>
+            <li>🆕 <strong>Anycast DNS</strong> — 최근접 리전 자동 라우팅</li>
+            <li>🆕 <strong>Multi-Master DB</strong> — Cassandra / Cloud Spanner</li>
+            <li>🆕 <strong>Kafka MirrorMaker 2</strong> — 리전 간 이벤트 복제</li>
+            <li>🔑 <strong>CAP 트레이드오프</strong> — 가용성 우선, 강한 일관성 완화</li>
+          </ul>
+        </div>
+        <div class="card c-blue">
+          <div class="card-title">글로벌 아키텍처 원칙</div>
+          <ul class="dot-list blue">
+            <li><strong>데이터 레지던시</strong> — GDPR (EU 데이터 EU 보관)</li>
+            <li><strong>Active-Active</strong> — 모든 리전이 실시간 트래픽 처리</li>
+            <li><strong>Active-Passive</strong> — DR용 대기 리전 (비용 절감)</li>
+            <li><strong>Conflict Resolution</strong> — Last-Write-Wins / CRDT</li>
+            <li><strong>Cell Architecture</strong> — 장애 반경 최소화 (Netflix)</li>
+          </ul>
+        </div>
+        <div class="memo" style="border-left-color: #c77dff; background: rgba(199,125,255,0.04);">
+          <strong style="color: #c77dff;">적합한 시나리오:</strong> 글로벌 서비스 (게임 · SNS · 커머스). 레이턴시 수십ms 이하 목표. 금융 데이터 등 강한 일관성이 필요한 영역은 별도 처리.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1599,6 +1956,15 @@
 </div><!-- /container -->
 
 <script>
+function switchTier(n) {
+  document.querySelectorAll('.arch-tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', i + 1 === n);
+  });
+  document.querySelectorAll('.arch-panel').forEach(function(panel, i) {
+    panel.classList.toggle('active', i + 1 === n);
+  });
+}
+
 function toggleNav() {
   document.getElementById('hamburgerBtn').classList.toggle('open');
   document.getElementById('navOverlay').classList.toggle('open');

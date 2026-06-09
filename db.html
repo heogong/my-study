@@ -391,6 +391,7 @@
   .section:nth-child(8)  { animation-delay: 0.35s; }
   .section:nth-child(9)  { animation-delay: 0.40s; }
   .section:nth-child(10) { animation-delay: 0.45s; }
+  .section:nth-child(11) { animation-delay: 0.50s; }
 
   @media (max-width: 700px) {
     .grid-2, .grid-3, .two-col { grid-template-columns: 1fr; }
@@ -875,10 +876,126 @@
     </div>
   </div>
 
-  <!-- 10. 면접 빈출 Q&A -->
+  <!-- 10. MySQL vs PostgreSQL vs Oracle -->
   <div class="section">
     <div class="section-header">
       <div class="section-num">10</div>
+      <div class="section-title">MySQL vs PostgreSQL vs Oracle</div>
+      <div class="section-tag tag-purple">RDBMS 비교</div>
+    </div>
+    <div class="card-full c-purple" style="margin-bottom:16px;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="color:#b76efb;">항목</th>
+            <th class="h-blue">MySQL</th>
+            <th class="h-green">PostgreSQL</th>
+            <th class="h-yellow">Oracle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>라이선스</td>
+            <td>GPL / 상용(Oracle)</td>
+            <td>PostgreSQL License (자유)</td>
+            <td>상용 (Enterprise)</td>
+          </tr>
+          <tr>
+            <td>기본 격리 수준</td>
+            <td><span class="hl b">REPEATABLE READ</span></td>
+            <td><span class="hl g">READ COMMITTED</span></td>
+            <td><span class="hl y">READ COMMITTED</span></td>
+          </tr>
+          <tr>
+            <td>스토리지 엔진</td>
+            <td>InnoDB(기본) · MyISAM · Memory</td>
+            <td>단일 엔진 (확장성↑)</td>
+            <td>단일 엔진 + ASM</td>
+          </tr>
+          <tr>
+            <td>JSON 지원</td>
+            <td>JSON 타입 (5.7+), 함수 제한적</td>
+            <td>JSONB(바이너리) — 인덱스·쿼리 강력</td>
+            <td>JSON / OSON (21c+)</td>
+          </tr>
+          <tr>
+            <td>Full-Text Search</td>
+            <td>기본 FTS (성능 한계)</td>
+            <td>tsvector / GIN 인덱스, 강력</td>
+            <td>Oracle Text (별도 옵션)</td>
+          </tr>
+          <tr>
+            <td>파티셔닝</td>
+            <td>Range · List · Hash · Key</td>
+            <td>Range · List · Hash (선언적)</td>
+            <td>Range · List · Hash · Composite — 가장 풍부</td>
+          </tr>
+          <tr>
+            <td>윈도우 함수</td>
+            <td>8.0+ 지원</td>
+            <td>오래전부터 완전 지원</td>
+            <td>완전 지원 (분석 함수 강력)</td>
+          </tr>
+          <tr>
+            <td>복제 / HA</td>
+            <td>비동기 복제, Group Replication, InnoDB Cluster</td>
+            <td>Streaming Replication, Logical Replication</td>
+            <td>Data Guard, RAC (Real Application Clusters)</td>
+          </tr>
+          <tr>
+            <td>확장성</td>
+            <td>읽기 스케일아웃 용이</td>
+            <td>플러그인(extension) 생태계 풍부</td>
+            <td>수직 확장 · RAC로 수평 확장</td>
+          </tr>
+          <tr>
+            <td>적합 케이스</td>
+            <td>웹 서비스, 스타트업, 빠른 읽기 중심</td>
+            <td>복잡한 쿼리, GIS, 분석, 오픈소스 엔터프라이즈</td>
+            <td>대형 금융·ERP, 고가용성 필수 환경</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-title">MySQL 특징</div>
+        <ul class="dot-list blue">
+          <li><span class="hl b">InnoDB</span> — MVCC 기반, 클러스터드 인덱스 구조</li>
+          <li>읽기 성능 최적화, 웹 스택(LAMP)에서 검증</li>
+          <li><span class="hl b">binlog</span> 기반 복제 — 단순하고 안정적</li>
+          <li>8.0에서 윈도우 함수·CTE 추가, 격차 축소</li>
+          <li>AWS RDS·Aurora에서 가장 많이 사용</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">PostgreSQL 특징</div>
+        <ul class="dot-list">
+          <li><span class="hl g">MVCC</span> + 모든 격리 수준 완벽 지원</li>
+          <li>JSONB · 배열 · hstore 등 다양한 타입</li>
+          <li><span class="hl g">PostGIS</span> — 공간 데이터(GIS) 사실상 표준</li>
+          <li>Extension 시스템 — pg_vector, TimescaleDB 등</li>
+          <li>SQL 표준 준수율이 가장 높음</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">Oracle 특징</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">RAC</span> — 다중 인스턴스가 공유 스토리지 접근</li>
+          <li>Undo Tablespace로 읽기 일관성 강력 보장</li>
+          <li>Hint 문법 — 옵티마이저 직접 제어 가능</li>
+          <li><span class="hl y">Flashback</span> — 과거 시점 데이터 조회·복구</li>
+          <li>라이선스 비용 높음, 대기업·금융 중심</li>
+        </ul>
+      </div>
+    </div>
+    <div class="memo"><strong>선택 기준 요약</strong> — 스타트업·웹 서비스 → <span class="hl b">MySQL</span>로 빠르게 시작. 복잡한 쿼리·GIS·JSON 분석 → <span class="hl g">PostgreSQL</span>. 고가용성이 최우선이고 비용 제약이 없는 대형 시스템 → <span class="hl y">Oracle</span>.</div>
+  </div>
+
+  <!-- 11. 면접 빈출 Q&A -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">11</div>
       <div class="section-title">면접 빈출 Q&amp;A</div>
       <div class="section-tag tag-yellow">Interview</div>
     </div>
