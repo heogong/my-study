@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSA 아키텍처 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --accent5: #4cc9f0;
+    --accent6: #c77dff;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 72px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 7vw, 88px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent6) 40%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent6);
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .tag-green  { background: rgba(0,245,212,0.1);   color: var(--accent1); border: 1px solid rgba(0,245,212,0.2); }
+  .tag-pink   { background: rgba(247,37,133,0.1);  color: var(--accent2); border: 1px solid rgba(247,37,133,0.2); }
+  .tag-yellow { background: rgba(255,214,10,0.1);  color: var(--accent3); border: 1px solid rgba(255,214,10,0.2); }
+  .tag-blue   { background: rgba(76,201,240,0.1);  color: var(--accent5); border: 1px solid rgba(76,201,240,0.2); }
+  .tag-purple { background: rgba(199,125,255,0.1); color: var(--accent6); border: 1px solid rgba(199,125,255,0.2); }
+  .tag-orange { background: rgba(255,100,20,0.1);  color: #ff8c42;        border: 1px solid rgba(255,100,20,0.2); }
+
+  /* Grid */
+  .grid-2    { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(199,125,255,0.25); transform: translateY(-2px); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .card.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .card.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card.c-purple::before { background: linear-gradient(90deg, var(--accent6), transparent); }
+  .card.c-orange::before { background: linear-gradient(90deg, #ff8c42, transparent); }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .card.c-green  .card-title { color: var(--accent1); }
+  .card.c-pink   .card-title { color: var(--accent2); }
+  .card.c-yellow .card-title { color: var(--accent3); }
+  .card.c-blue   .card-title { color: var(--accent5); }
+  .card.c-purple .card-title { color: var(--accent6); }
+  .card.c-orange .card-title { color: #ff8c42; }
+
+  /* Lists */
+  ul.dot-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.dot-list li {
+    font-size: 13px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.55;
+  }
+  ul.dot-list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent1); font-size: 10px; top: 2px; }
+  ul.dot-list.pink li::before   { color: var(--accent2); }
+  ul.dot-list.yellow li::before { color: var(--accent3); }
+  ul.dot-list.blue li::before   { color: var(--accent5); }
+  ul.dot-list.purple li::before { color: var(--accent6); }
+  ul.dot-list.orange li::before { color: #ff8c42; }
+
+  /* Compare table */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.5; vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  th.h-green  { color: var(--accent1); }
+  th.h-pink   { color: var(--accent2); }
+  th.h-yellow { color: var(--accent3); }
+  th.h-blue   { color: var(--accent5); }
+  th.h-purple { color: var(--accent6); }
+  th.h-orange { color: #ff8c42; }
+
+  /* Highlight inline */
+  .hl { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .hl.g { color: var(--accent1); }
+  .hl.p { color: var(--accent2); }
+  .hl.y { color: var(--accent3); }
+  .hl.b { color: var(--accent5); }
+  .hl.v { color: var(--accent6); }
+  .hl.o { color: #ff8c42; }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .badge.o  { background: rgba(255,214,10,0.15);  color: var(--accent3); }
+  .badge.r  { background: rgba(247,37,133,0.15);  color: var(--accent2); }
+  .badge.g  { background: rgba(0,245,212,0.15);   color: var(--accent1); }
+  .badge.b  { background: rgba(76,201,240,0.15);  color: var(--accent5); }
+  .badge.v  { background: rgba(199,125,255,0.15); color: var(--accent6); }
+
+  /* Memo */
+  .memo {
+    background: rgba(255,214,10,0.04);
+    border: 1px solid rgba(255,214,10,0.15);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c0c0a0;
+    margin-top: 12px;
+  }
+  .memo strong { color: var(--accent3); }
+
+  .memo.blue {
+    background: rgba(76,201,240,0.04);
+    border-color: rgba(76,201,240,0.15);
+    border-left-color: var(--accent5);
+    color: #a0c0d0;
+  }
+  .memo.blue strong { color: var(--accent5); }
+
+  .memo.pink {
+    background: rgba(247,37,133,0.04);
+    border-color: rgba(247,37,133,0.15);
+    border-left-color: var(--accent2);
+    color: #d0a0b0;
+  }
+  .memo.pink strong { color: var(--accent2); }
+
+  .memo.purple {
+    background: rgba(199,125,255,0.04);
+    border-color: rgba(199,125,255,0.15);
+    border-left-color: var(--accent6);
+    color: #c0a0d8;
+  }
+  .memo.purple strong { color: var(--accent6); }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+  /* slabel */
+  .slabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* Full-width card */
+  .card-full {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-full::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .card-full.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card-full.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card-full.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card-full.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .card-full.c-purple::before { background: linear-gradient(90deg, var(--accent6), transparent); }
+  .card-full.c-orange::before { background: linear-gradient(90deg, #ff8c42, transparent); }
+
+  /* Pill row */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pill { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 10px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); }
+
+  /* Code block */
+  .code-block {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #a0a0c0;
+    overflow-x: auto;
+    margin-top: 10px;
+  }
+  .code-block .kw  { color: var(--accent2); }
+  .code-block .fn  { color: var(--accent1); }
+  .code-block .cm  { color: #444460; font-style: italic; }
+  .code-block .val { color: var(--accent3); }
+  .code-block .ty  { color: var(--accent5); }
+  .code-block .str { color: #98c379; }
+
+  /* Arch layers */
+  .arch-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .arch-layer {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .arch-layer:last-child { border-bottom: none; }
+  .arch-layer:hover { background: rgba(255,255,255,0.015); }
+  .layer-label {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .layer-label::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--lc);
+  }
+  .layer-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--lc);
+  }
+  .layer-kr { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .layer-body {
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .layer-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--lc) 30%, transparent);
+    color: var(--lc);
+    background: color-mix(in srgb, var(--lc) 8%, transparent);
+  }
+
+  /* Flow diagram */
+  .flow-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  .flow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .flow-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 600px;
+  }
+  .flow-node { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+  .flow-box {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--fn-color, var(--accent6));
+    background: color-mix(in srgb, var(--fn-color, var(--accent6)) 10%, transparent);
+    text-align: center;
+    min-width: 90px;
+  }
+  .flow-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+  .flow-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--fn-color, var(--accent6));
+    display: block;
+  }
+  .flow-sub { font-size: 9px; color: var(--muted); display: block; white-space: nowrap; margin-top: 2px; }
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 32px;
+    padding: 0 4px;
+  }
+  .arrow-line { height: 1.5px; width: 100%; background: linear-gradient(90deg, var(--border), var(--muted), var(--border)); }
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    white-space: nowrap;
+    margin-top: 3px;
+  }
+
+  /* Pattern card */
+  .pattern-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+  .pattern-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .pattern-card:hover { transform: translateY(-3px); border-color: var(--pc-color); }
+  .pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pc-color); }
+  .pattern-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .pattern-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--pc-color) 20%, transparent);
+    color: var(--pc-color);
+    border: 1px solid color-mix(in srgb, var(--pc-color) 40%, transparent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pattern-name { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--pc-color); }
+  .pattern-kr { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .pattern-desc { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 10px; }
+  .pattern-usage { padding: 9px 11px; background: rgba(0,0,0,0.2); border-radius: 6px; font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .pattern-usage strong { color: var(--pc-color); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+
+  /* Q&A */
+  .qa-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .qa-q {
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent6);
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(199,125,255,0.05);
+    border-bottom: 1px solid var(--border);
+  }
+  .qa-q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .qa-a {
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .qa-a .key { color: var(--accent1); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .qa-a .em  { color: var(--accent3); font-weight: 700; }
+
+  /* Animations */
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: translateY(0); } }
+
+  /* Hamburger nav */
+  .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
+  .hamburger-btn:hover { border-color: var(--accent6); box-shadow: 0 0 12px rgba(199,125,255,0.3); }
+  .hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--accent6); border-radius: 2px; transition: all 0.3s ease; }
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(2px); }
+  .nav-overlay.open { display: block; }
+  .side-nav { position: fixed; top: 0; right: -280px; width: 260px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 999; padding: 80px 24px 32px; transition: right 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .side-nav.open { right: 0; }
+  .nav-header { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .nav-links { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .nav-links a { display: block; padding: 12px 16px; color: var(--text); text-decoration: none; border-radius: 8px; font-size: 15px; transition: all 0.2s ease; border: 1px solid transparent; }
+  .nav-links a:hover { background: var(--card); border-color: var(--accent6); color: var(--accent6); }
+  .nav-links a.active { background: rgba(199,125,255,0.1); border-color: var(--accent6); color: var(--accent6); }
+
+  @media (max-width: 768px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .arch-layer { grid-template-columns: 110px 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleNav()" aria-label="메뉴"><span></span><span></span><span></span></button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<nav class="side-nav" id="sideNav">
+  <div class="nav-header">치트시트</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Java 아키텍처</a></li>
+    <li><a href="spring.html">Spring</a></li>
+    <li><a href="gc.html">Java GC</a></li>
+    <li><a href="db.html">데이터베이스</a></li>
+    <li><a href="ds.html">자료구조</a></li>
+    <li><a href="traffic.html">대용량 트래픽</a></li>
+    <li><a href="msa.html" class="active">MSA 아키텍처</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <header>
+    <div class="label">Architecture · Distributed Systems</div>
+    <h1>MSA Architecture</h1>
+    <div class="subtitle">마이크로서비스 아키텍처 · 핵심 패턴 · 기술 면접 대비</div>
+  </header>
+
+  <!-- ── 1. MSA vs Monolith ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Monolith vs MSA</span>
+      <span class="section-tag tag-purple">Architecture</span>
+    </div>
+
+    <div class="card-full c-purple" style="margin-bottom:16px;">
+      <div class="slabel">비교 개요</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-yellow">구분</th>
+            <th class="h-blue">모놀리식</th>
+            <th class="h-purple">마이크로서비스</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="hl v">배포 단위</span></td>
+            <td>하나의 단일 배포 단위</td>
+            <td>서비스별 독립 배포</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">기술 스택</span></td>
+            <td>단일 언어/프레임워크</td>
+            <td>폴리글랏 (서비스별 최적 기술 선택 가능)</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">스케일링</span></td>
+            <td>전체를 함께 확장</td>
+            <td>병목 서비스만 선택적 확장</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">장애 격리</span></td>
+            <td>한 곳 장애 → 전체 장애</td>
+            <td>서비스 단위 격리 (Circuit Breaker)</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">데이터 관리</span></td>
+            <td>단일 DB 공유</td>
+            <td>DB per Service (각 서비스 전용 DB)</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">개발 복잡도</span></td>
+            <td>낮음 (초기)</td>
+            <td>높음 (네트워크 통신, 분산 트랜잭션)</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">운영 복잡도</span></td>
+            <td>낮음</td>
+            <td>높음 (컨테이너 오케스트레이션, 모니터링)</td>
+          </tr>
+          <tr>
+            <td><span class="hl v">팀 구조</span></td>
+            <td>기능별 팀 (프론트/백/DB)</td>
+            <td>도메인별 자율팀 (Conway's Law)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="memo purple">
+        <strong>언제 MSA를 선택하는가?</strong><br>
+        팀 규모가 크고, 서비스별 스케일링 요구가 다르며, 빠른 독립 배포가 중요할 때.
+        소규모 팀이나 초기 스타트업에서는 <strong>모놀리스 퍼스트</strong> 전략이 더 현명하다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. 핵심 구성요소 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">핵심 구성요소</span>
+      <span class="section-tag tag-blue">Components</span>
+    </div>
+
+    <div class="arch-wrap">
+      <div class="arch-layer" style="--lc: var(--accent2);">
+        <div class="layer-label">
+          <div class="layer-name">Client</div>
+          <div class="layer-kr">클라이언트</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">웹, 모바일 앱. 직접 서비스에 접근하지 않고 API Gateway를 통해서만 접근</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent2)">Web App</span>
+            <span class="chip" style="--lc:var(--accent2)">Mobile App</span>
+            <span class="chip" style="--lc:var(--accent2)">3rd Party</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent3);">
+        <div class="layer-label">
+          <div class="layer-name">API Gateway</div>
+          <div class="layer-kr">진입점</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">단일 진입점. 라우팅, 인증/인가, 로드밸런싱, Rate Limiting, SSL 종단, 요청 집계(Aggregation)</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent3)">Kong</span>
+            <span class="chip" style="--lc:var(--accent3)">AWS API GW</span>
+            <span class="chip" style="--lc:var(--accent3)">Nginx</span>
+            <span class="chip" style="--lc:var(--accent3)">Spring Cloud GW</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent6);">
+        <div class="layer-label">
+          <div class="layer-name">Service Mesh</div>
+          <div class="layer-kr">서비스 간 통신</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">서비스 간 통신 제어. 사이드카 프록시(Envoy)가 각 서비스에 붙어 트래픽 제어, 관찰 가능성 제공</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent6)">Istio</span>
+            <span class="chip" style="--lc:var(--accent6)">Linkerd</span>
+            <span class="chip" style="--lc:var(--accent6)">Envoy Proxy</span>
+            <span class="chip" style="--lc:var(--accent6)">Consul</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent1);">
+        <div class="layer-label">
+          <div class="layer-name">Services</div>
+          <div class="layer-kr">마이크로서비스</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">도메인 경계로 분리된 독립 서비스들. 각 서비스는 자체 DB를 보유하고 REST/gRPC/메시지로 통신</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent1)">User Service</span>
+            <span class="chip" style="--lc:var(--accent1)">Order Service</span>
+            <span class="chip" style="--lc:var(--accent1)">Payment Service</span>
+            <span class="chip" style="--lc:var(--accent1)">Notification Service</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent5);">
+        <div class="layer-label">
+          <div class="layer-name">Infrastructure</div>
+          <div class="layer-kr">인프라</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">서비스 등록/발견, 설정 관리, 메시지 브로커, 분산 캐시, 컨테이너 오케스트레이션</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent5)">Eureka</span>
+            <span class="chip" style="--lc:var(--accent5)">Kafka</span>
+            <span class="chip" style="--lc:var(--accent5)">Redis</span>
+            <span class="chip" style="--lc:var(--accent5)">Kubernetes</span>
+            <span class="chip" style="--lc:var(--accent5)">Config Server</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Gateway 상세 -->
+    <div class="grid-2">
+      <div class="card c-yellow">
+        <div class="card-title">API Gateway 역할</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">라우팅</span> — URL 기반으로 적절한 서비스로 요청 전달</li>
+          <li><span class="hl y">인증/인가</span> — JWT 검증, OAuth2 처리를 중앙 집중화</li>
+          <li><span class="hl y">Rate Limiting</span> — IP/사용자별 요청 수 제한</li>
+          <li><span class="hl y">Circuit Breaker</span> — 하위 서비스 장애 시 빠른 실패</li>
+          <li><span class="hl y">Request Aggregation</span> — 여러 서비스 응답 조합 (BFF 패턴)</li>
+          <li><span class="hl y">SSL Termination</span> — HTTPS 종단, 내부는 HTTP</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">Service Discovery</div>
+        <ul class="dot-list">
+          <li><span class="hl g">Client-Side Discovery</span> — 클라이언트가 레지스트리에서 조회 후 직접 호출 (Eureka + Ribbon)</li>
+          <li><span class="hl g">Server-Side Discovery</span> — 로드밸런서가 레지스트리 조회 후 라우팅 (AWS ELB + Route53)</li>
+          <li><span class="hl g">Self Registration</span> — 서비스 기동 시 레지스트리에 자신 등록</li>
+          <li><span class="hl g">Health Check</span> — 주기적으로 서비스 상태 확인, 비정상 인스턴스 제거</li>
+        </ul>
+        <div class="memo">
+          <strong>Eureka vs Consul:</strong> Eureka는 AP 보장(가용성 우선), Consul은 CP 보장(일관성 우선)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. 서비스 통신 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">서비스 간 통신 패턴</span>
+      <span class="section-tag tag-blue">Communication</span>
+    </div>
+
+    <!-- 동기 통신 플로우 -->
+    <div class="flow-diagram">
+      <div class="flow-label">동기 통신 (Synchronous)</div>
+      <div class="flow-track">
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent2)">
+            <span class="flow-icon">📱</span>
+            <span class="flow-name">Client</span>
+            <span class="flow-sub">요청자</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">HTTP/HTTPS</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent3)">
+            <span class="flow-icon">🚪</span>
+            <span class="flow-name">API GW</span>
+            <span class="flow-sub">진입점</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">REST / gRPC</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent1)">
+            <span class="flow-icon">⚙️</span>
+            <span class="flow-name">Service A</span>
+            <span class="flow-sub">처리</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">동기 호출</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent5)">
+            <span class="flow-icon">⚙️</span>
+            <span class="flow-name">Service B</span>
+            <span class="flow-sub">응답 대기</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">응답</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent6)">
+            <span class="flow-icon">🗄️</span>
+            <span class="flow-name">DB</span>
+            <span class="flow-sub">저장소</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비동기 통신 플로우 -->
+    <div class="flow-diagram">
+      <div class="flow-label">비동기 통신 (Asynchronous / Event-Driven)</div>
+      <div class="flow-track">
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent1)">
+            <span class="flow-icon">📤</span>
+            <span class="flow-name">Producer</span>
+            <span class="flow-sub">이벤트 발행</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">publish</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent3)">
+            <span class="flow-icon">📨</span>
+            <span class="flow-name">Kafka/MQ</span>
+            <span class="flow-sub">메시지 브로커</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">subscribe</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent5)">
+            <span class="flow-icon">📥</span>
+            <span class="flow-name">Consumer A</span>
+            <span class="flow-sub">독립 처리</span>
+          </div>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-label">subscribe</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-box" style="--fn-color: var(--accent6)">
+            <span class="flow-icon">📥</span>
+            <span class="flow-name">Consumer B</span>
+            <span class="flow-sub">독립 처리</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-blue">
+        <div class="card-title">REST vs gRPC</div>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="h-yellow">항목</th>
+              <th class="h-blue">REST</th>
+              <th class="h-purple">gRPC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>프로토콜</td><td>HTTP/1.1</td><td>HTTP/2</td></tr>
+            <tr><td>직렬화</td><td>JSON (텍스트)</td><td>Protobuf (바이너리)</td></tr>
+            <tr><td>성능</td><td>상대적으로 느림</td><td>빠름 (2~10배)</td></tr>
+            <tr><td>스트리밍</td><td>미지원</td><td>양방향 스트리밍</td></tr>
+            <tr><td>코드 생성</td><td>수동</td><td>자동 (proto 기반)</td></tr>
+            <tr><td>적합 대상</td><td>외부 API</td><td>내부 서비스 간</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card c-purple">
+        <div class="card-title">비동기 메시징</div>
+        <ul class="dot-list purple">
+          <li><span class="hl v">Kafka</span> — 대용량 이벤트 스트림, 영속성 보장, Consumer Group으로 병렬 처리. 파티션 단위 순서 보장</li>
+          <li><span class="hl v">RabbitMQ</span> — AMQP 기반, 복잡한 라우팅(Exchange/Queue), 메시지 TTL/우선순위</li>
+          <li><span class="hl v">At-Least-Once</span> — 중복 가능, 멱등성(Idempotency) 보장 필요</li>
+          <li><span class="hl v">At-Most-Once</span> — 유실 가능, 중복 없음</li>
+          <li><span class="hl v">Exactly-Once</span> — Kafka Transactions로 구현 가능</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="memo blue">
+      <strong>동기 vs 비동기 선택 기준:</strong> 즉각적인 응답이 필요하면 동기(REST/gRPC), 처리 결과가 나중에 필요하거나 여러 서비스에 동시 전파할 때는 비동기(Kafka/MQ).
+      비동기는 서비스 간 결합도를 낮추고 탄력성을 높이지만 <strong>분산 트랜잭션 처리가 복잡</strong>해진다.
+    </div>
+  </section>
+
+  <!-- ── 4. 데이터 관리 패턴 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">데이터 관리 패턴</span>
+      <span class="section-tag tag-yellow">Data Patterns</span>
+    </div>
+
+    <div class="pattern-grid">
+      <div class="pattern-card" style="--pc-color: var(--accent1)">
+        <div class="pattern-header">
+          <span class="pattern-badge">DB</span>
+          <div>
+            <div class="pattern-name">DB per Service</div>
+            <div class="pattern-kr">서비스별 독립 데이터베이스</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          각 마이크로서비스는 전용 DB를 보유. 다른 서비스의 DB에 직접 접근 금지. 서비스 API를 통해서만 데이터 조회/변경 가능.
+        </div>
+        <div class="pattern-usage">
+          <strong>장점</strong>
+          서비스별 최적 DB 선택 가능 (폴리글랏 퍼시스턴스), 독립 스케일링, 장애 격리
+        </div>
+        <div class="pattern-usage" style="margin-top:6px;">
+          <strong>단점</strong>
+          조인 불가 → API Composition 또는 CQRS로 해결, 분산 트랜잭션 복잡도 증가
+        </div>
+      </div>
+
+      <div class="pattern-card" style="--pc-color: var(--accent3)">
+        <div class="pattern-header">
+          <span class="pattern-badge">TX</span>
+          <div>
+            <div class="pattern-name">Saga Pattern</div>
+            <div class="pattern-kr">분산 트랜잭션</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          2PC 없이 분산 트랜잭션 관리. 로컬 트랜잭션 체인으로 구성하고, 실패 시 보상 트랜잭션(Compensating Transaction) 실행.
+        </div>
+        <div class="pattern-usage">
+          <strong>Choreography (코레오그래피)</strong>
+          각 서비스가 이벤트 발행/구독으로 자율 조정. 중앙 조정자 없음. 서비스 수 증가 시 흐름 추적 어려움
+        </div>
+        <div class="pattern-usage" style="margin-top:6px;">
+          <strong>Orchestration (오케스트레이션)</strong>
+          중앙 Saga Orchestrator가 각 서비스에 명령. 흐름 파악 쉬움. 단일 실패 지점 존재
+        </div>
+      </div>
+
+      <div class="pattern-card" style="--pc-color: var(--accent5)">
+        <div class="pattern-header">
+          <span class="pattern-badge">QUERY</span>
+          <div>
+            <div class="pattern-name">CQRS</div>
+            <div class="pattern-kr">명령/조회 책임 분리</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          Command(쓰기)와 Query(읽기)를 분리. 쓰기 모델은 도메인 규칙 중심, 읽기 모델은 조회 최적화된 별도 View DB 유지.
+        </div>
+        <div class="pattern-usage">
+          <strong>적용 시나리오</strong>
+          읽기/쓰기 비율 불균형 시스템, 복잡한 집계 쿼리 필요 시, 이벤트 소싱과 함께 사용
+        </div>
+        <div class="memo blue" style="margin-top:8px;">
+          <strong>주의:</strong> 최종 일관성(Eventual Consistency). 쓰기 후 즉시 읽기 시 오래된 데이터 반환 가능
+        </div>
+      </div>
+
+      <div class="pattern-card" style="--pc-color: var(--accent6)">
+        <div class="pattern-header">
+          <span class="pattern-badge">EVENT</span>
+          <div>
+            <div class="pattern-name">Event Sourcing</div>
+            <div class="pattern-kr">이벤트 기반 상태 저장</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          현재 상태 대신 <strong>이벤트의 시퀀스</strong>를 저장. 현재 상태는 이벤트를 재생(Replay)하여 계산. 완전한 변경 이력 보존.
+        </div>
+        <div class="pattern-usage">
+          <strong>장점</strong>
+          완벽한 감사 로그, 시간 여행(Time Travel), CQRS와 궁합 좋음
+        </div>
+        <div class="pattern-usage" style="margin-top:6px;">
+          <strong>단점</strong>
+          이벤트 스키마 변경 어려움, 스냅샷 없으면 Replay 성능 저하
+        </div>
+      </div>
+
+      <div class="pattern-card" style="--pc-color: #ff8c42">
+        <div class="pattern-header">
+          <span class="pattern-badge">SYNC</span>
+          <div>
+            <div class="pattern-name">Outbox Pattern</div>
+            <div class="pattern-kr">트랜잭션 아웃박스</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          DB 저장과 이벤트 발행의 원자성 보장. 이벤트를 메시지 브로커 직접 발행 대신 DB의 Outbox 테이블에 함께 저장하고, 별도 프로세스가 발행.
+        </div>
+        <div class="pattern-usage">
+          <strong>구현 방식</strong>
+          Debezium (CDC) 또는 Polling Publisher로 Outbox 테이블 감지 후 Kafka 발행
+        </div>
+      </div>
+
+      <div class="pattern-card" style="--pc-color: var(--accent2)">
+        <div class="pattern-header">
+          <span class="pattern-badge">READ</span>
+          <div>
+            <div class="pattern-name">API Composition</div>
+            <div class="pattern-kr">API 조합</div>
+          </div>
+        </div>
+        <div class="pattern-desc">
+          여러 서비스의 데이터를 API 호출로 조합하여 반환. DB 조인 대신 여러 서비스에 쿼리 후 메모리에서 조인. BFF 패턴과 함께 사용.
+        </div>
+        <div class="pattern-usage">
+          <strong>단점</strong>
+          N+1 문제 주의. 여러 서비스 중 하나 장애 시 전체 응답 실패 가능 → Circuit Breaker 필수
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. 장애 처리 패턴 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">장애 처리 패턴 (Resilience)</span>
+      <span class="section-tag tag-pink">Fault Tolerance</span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="card c-pink">
+        <div class="card-title">Circuit Breaker</div>
+        <ul class="dot-list pink">
+          <li>장애 서비스 호출을 빠르게 차단하여 연쇄 장애(Cascade Failure) 방지</li>
+          <li><span class="hl p">Closed</span> — 정상 상태, 모든 요청 통과</li>
+          <li><span class="hl p">Open</span> — 임계치 초과 시, 모든 요청 즉시 실패 반환 (Fallback)</li>
+          <li><span class="hl p">Half-Open</span> — 일정 시간 후 소량 요청 테스트, 성공 시 Closed로 전환</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">Resilience4j</span>
+          <span class="pill">Hystrix (deprecated)</span>
+          <span class="pill">Spring Cloud</span>
+        </div>
+        <div class="code-block">
+<span class="cm">// Resilience4j Circuit Breaker 예시</span>
+<span class="ty">CircuitBreaker</span> cb = <span class="ty">CircuitBreaker</span>.<span class="fn">ofDefaults</span>(<span class="str">"orderService"</span>);
+<span class="ty">Supplier</span>&lt;<span class="ty">Order</span>&gt; decorated = <span class="ty">CircuitBreaker</span>
+  .<span class="fn">decorateSupplier</span>(cb, orderService::<span class="fn">getOrder</span>);
+<span class="ty">Try</span>.<span class="fn">ofSupplier</span>(decorated)
+  .<span class="fn">recover</span>(ex -> <span class="fn">fallbackOrder</span>());
+        </div>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">기타 탄력성 패턴</div>
+        <ul class="dot-list yellow">
+          <li>
+            <span class="hl y">Retry</span> — 일시적 장애 시 재시도. Exponential Backoff + Jitter로 재시도 폭풍 방지
+          </li>
+          <li>
+            <span class="hl y">Timeout</span> — 응답 대기 시간 제한. 느린 서비스로 인한 스레드 고갈 방지
+          </li>
+          <li>
+            <span class="hl y">Bulkhead</span> — 서비스별 스레드 풀 격리. 한 서비스 장애가 다른 서비스 스레드 고갈 방지 (선박 격벽 구조)
+          </li>
+          <li>
+            <span class="hl y">Rate Limiter</span> — 초당 요청 수 제한. 과부하 방지
+          </li>
+          <li>
+            <span class="hl y">Fallback</span> — 장애 시 기본값/캐시값 반환. 서비스 저하(Degradation) 허용
+          </li>
+          <li>
+            <span class="hl y">Health Check</span> — /health 엔드포인트로 정상 여부 확인. K8s liveness/readiness probe
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="memo pink">
+      <strong>연쇄 장애(Cascade Failure) 시나리오:</strong> Service A → Service B → Service C 체인에서 C 장애 시,
+      B의 스레드가 모두 C 응답 대기로 고갈되고, A도 같은 방식으로 고갈되어 전체 시스템 다운.
+      <strong>Circuit Breaker + Timeout + Bulkhead</strong>의 조합으로 방어.
+    </div>
+  </section>
+
+  <!-- ── 6. 배포 전략 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">배포 전략</span>
+      <span class="section-tag tag-green">Deployment</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">Blue/Green Deployment</div>
+        <ul class="dot-list">
+          <li>현재 버전(Blue)과 새 버전(Green) 환경을 동시 유지</li>
+          <li>트래픽을 한 번에 Green으로 전환, 문제 시 즉시 Blue로 롤백</li>
+          <li><span class="hl g">장점</span> — 무중단, 즉시 롤백, 운영 환경 그대로 테스트</li>
+          <li><span class="hl g">단점</span> — 인프라 비용 2배, DB 스키마 변경 주의</li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">Canary Deployment</div>
+        <ul class="dot-list blue">
+          <li>새 버전을 소수 인스턴스에만 배포 (5~10%), 점진적 트래픽 증가</li>
+          <li>실제 사용자 트래픽으로 검증 후 전체 롤아웃</li>
+          <li><span class="hl b">장점</span> — 실제 환경 검증, 위험 최소화</li>
+          <li><span class="hl b">단점</span> — 두 버전 동시 운영 복잡도, 모니터링 필수</li>
+        </ul>
+      </div>
+      <div class="card c-purple">
+        <div class="card-title">Rolling Update</div>
+        <ul class="dot-list purple">
+          <li>인스턴스를 순차적으로 교체 (배포 중 구버전/신버전 동시 운영)</li>
+          <li>K8s 기본 배포 전략. maxSurge / maxUnavailable 설정</li>
+          <li><span class="hl v">장점</span> — 별도 인프라 불필요, 점진적 교체</li>
+          <li><span class="hl v">단점</span> — 버전 혼재 기간 존재, API 하위 호환 필수</li>
+        </ul>
+      </div>
+      <div class="card c-orange">
+        <div class="card-title">컨테이너 & 오케스트레이션</div>
+        <ul class="dot-list orange">
+          <li><span class="hl o">Docker</span> — 서비스별 컨테이너 이미지 빌드, 환경 일관성 보장</li>
+          <li><span class="hl o">Kubernetes</span> — 컨테이너 오케스트레이션, 자동 스케일링(HPA), 자가 치유</li>
+          <li><span class="hl o">Helm Chart</span> — K8s 배포 패키지 관리</li>
+          <li><span class="hl o">CI/CD</span> — Jenkins/GitHub Actions → 이미지 빌드 → 레지스트리 → K8s 배포</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7. 관찰 가능성 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">관찰 가능성 (Observability)</span>
+      <span class="section-tag tag-orange">Monitoring</span>
+    </div>
+
+    <div class="arch-wrap">
+      <div class="arch-layer" style="--lc: var(--accent1);">
+        <div class="layer-label">
+          <div class="layer-name">Metrics</div>
+          <div class="layer-kr">메트릭</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">수치형 시계열 데이터. CPU/메모리/응답시간/에러율 등. 알림(Alert) 기준으로 활용</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent1)">Prometheus</span>
+            <span class="chip" style="--lc:var(--accent1)">Grafana</span>
+            <span class="chip" style="--lc:var(--accent1)">Micrometer</span>
+            <span class="chip" style="--lc:var(--accent1)">AWS CloudWatch</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent3);">
+        <div class="layer-label">
+          <div class="layer-name">Logging</div>
+          <div class="layer-kr">로그</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">이벤트의 텍스트 기록. 구조화 로그(JSON) 권장. Correlation ID로 요청 추적. 중앙 집중 수집 필수</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent3)">ELK Stack</span>
+            <span class="chip" style="--lc:var(--accent3)">Elasticsearch</span>
+            <span class="chip" style="--lc:var(--accent3)">Logstash</span>
+            <span class="chip" style="--lc:var(--accent3)">Kibana</span>
+            <span class="chip" style="--lc:var(--accent3)">Fluentd</span>
+          </div>
+        </div>
+      </div>
+      <div class="arch-layer" style="--lc: var(--accent6);">
+        <div class="layer-label">
+          <div class="layer-name">Tracing</div>
+          <div class="layer-kr">분산 추적</div>
+        </div>
+        <div class="layer-body">
+          <div class="layer-desc">요청이 여러 서비스를 거치는 흐름 추적. Trace ID / Span ID로 전체 호출 체인 시각화. 병목 서비스 식별</div>
+          <div class="chip-row">
+            <span class="chip" style="--lc:var(--accent6)">Zipkin</span>
+            <span class="chip" style="--lc:var(--accent6)">Jaeger</span>
+            <span class="chip" style="--lc:var(--accent6)">OpenTelemetry</span>
+            <span class="chip" style="--lc:var(--accent6)">Spring Sleuth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-full c-blue">
+      <div class="slabel">분산 추적 핵심 개념</div>
+      <div class="grid-3">
+        <div>
+          <div class="card-title" style="color:var(--accent5); font-size:11px; margin-bottom:8px;">Trace ID</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.6;">하나의 요청 전체를 식별하는 고유 ID. 서비스 A → B → C 체인 전체를 하나의 Trace로 묶음</div>
+        </div>
+        <div>
+          <div class="card-title" style="color:var(--accent5); font-size:11px; margin-bottom:8px;">Span ID</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.6;">개별 서비스 내 작업 단위. Parent Span → Child Span 트리 구조로 호출 계층 표현</div>
+        </div>
+        <div>
+          <div class="card-title" style="color:var(--accent5); font-size:11px; margin-bottom:8px;">Correlation ID</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.6;">HTTP Header로 전파 (X-Correlation-ID). 로그에 포함하여 분산 로그를 하나의 흐름으로 조회</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 8. 보안 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">MSA 보안</span>
+      <span class="section-tag tag-pink">Security</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-pink">
+        <div class="card-title">인증/인가 (JWT + OAuth2)</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">JWT</span> — 서명된 토큰으로 사용자 정보 담아 전달. API Gateway에서 검증, 하위 서비스는 신뢰</li>
+          <li><span class="hl p">OAuth2 / OIDC</span> — 서드파티 인증. Authorization Code Flow 권장</li>
+          <li><span class="hl p">중앙 Auth Service</span> — 토큰 발급/검증/갱신 전담 서비스</li>
+          <li><span class="hl p">API Key</span> — 서비스 간 내부 통신에 API Key 또는 mTLS 사용</li>
+        </ul>
+        <div class="code-block">
+<span class="cm">// JWT Payload 구조</span>
+{
+  <span class="str">"sub"</span>: <span class="str">"user-123"</span>,
+  <span class="str">"roles"</span>: [<span class="str">"ROLE_USER"</span>],
+  <span class="str">"exp"</span>: <span class="val">1720000000</span>,
+  <span class="str">"iss"</span>: <span class="str">"auth-service"</span>
+}
+        </div>
+      </div>
+      <div class="card c-purple">
+        <div class="card-title">서비스 간 보안</div>
+        <ul class="dot-list purple">
+          <li><span class="hl v">mTLS</span> — 서비스 간 상호 TLS 인증. 인증서 기반으로 서비스 신원 확인. Istio로 자동 관리</li>
+          <li><span class="hl v">네트워크 정책</span> — K8s NetworkPolicy로 허용된 서비스만 통신</li>
+          <li><span class="hl v">Secret 관리</span> — 환경변수에 직접 저장 금지. HashiCorp Vault, AWS Secrets Manager</li>
+          <li><span class="hl v">Zero Trust</span> — 내부 네트워크도 신뢰하지 않음. 모든 요청 검증</li>
+          <li><span class="hl v">RBAC</span> — Role 기반 접근 제어. 서비스별 최소 권한 원칙</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 9. 서비스 분리 원칙 ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">서비스 분리 원칙 (DDD)</span>
+      <span class="section-tag tag-yellow">Domain Design</span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="card c-yellow">
+        <div class="card-title">Bounded Context</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">경계 컨텍스트</span> — 도메인 모델이 명확히 정의되는 경계. 각 BC 내에서는 용어/모델이 일관성 유지</li>
+          <li>"Order"가 주문 서비스에서는 배송 정보 포함, 재고 서비스에서는 SKU/수량으로 다르게 정의</li>
+          <li>BC가 MSA 서비스 분리 단위의 자연스러운 경계</li>
+          <li><span class="hl y">Context Map</span> — BC 간 관계 다이어그램. 통합 방식 명시</li>
+        </ul>
+      </div>
+      <div class="card c-orange">
+        <div class="card-title">서비스 분리 기준</div>
+        <ul class="dot-list orange">
+          <li><span class="hl o">단일 책임</span> — 변경 이유가 하나뿐인 서비스 단위로 분리</li>
+          <li><span class="hl o">팀 소유권</span> — Conway's Law: 팀 구조가 아키텍처를 따라감. 팀 단위로 서비스 소유</li>
+          <li><span class="hl o">독립 배포</span> — 다른 서비스 수정 없이 독립 배포 가능해야 함</li>
+          <li><span class="hl o">데이터 경계</span> — 데이터를 공유하는 서비스는 분리하지 말 것</li>
+          <li><span class="hl o">너무 작은 분리 주의</span> — Nano Service Anti-pattern: 네트워크 홉만 증가</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="memo">
+      <strong>Strangler Fig Pattern:</strong> 모놀리스에서 MSA로 점진적 전환 전략.
+      새 기능은 새 서비스로, 기존 기능은 점진적으로 마이그레이션.
+      API Gateway가 구/신 버전 라우팅. 한번에 전환하는 Big Bang 방식보다 안전.
+    </div>
+  </section>
+
+  <!-- ── 10. 핵심 Q&A ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title">기술 면접 핵심 질문</span>
+      <span class="section-tag tag-purple">Q&amp;A</span>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q01</span>MSA에서 분산 트랜잭션을 어떻게 처리하나요?</div>
+      <div class="qa-a">
+        MSA에서는 각 서비스가 독립 DB를 가지므로 RDBMS의 2PC(Two-Phase Commit)를 사용할 수 없습니다.
+        대신 <span class="em">Saga 패턴</span>을 사용합니다.<br><br>
+        <span class="key">Choreography Saga</span> — 각 서비스가 로컬 트랜잭션 완료 후 이벤트 발행, 다음 서비스가 구독하여 처리. 느슨한 결합이지만 흐름 파악이 어렵습니다.<br>
+        <span class="key">Orchestration Saga</span> — 중앙 Saga Orchestrator가 각 서비스에 명령 전달. 흐름이 명확하지만 단일 실패 지점이 생깁니다.<br><br>
+        실패 시에는 <span class="em">보상 트랜잭션(Compensating Transaction)</span>으로 이미 수행한 작업을 롤백합니다.
+        결과적 일관성(Eventual Consistency)을 허용하는 설계가 전제됩니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q02</span>Circuit Breaker의 동작 원리와 상태 전이를 설명해주세요.</div>
+      <div class="qa-a">
+        Circuit Breaker는 외부 서비스 장애 시 연쇄 실패를 막는 패턴입니다. 세 가지 상태로 동작합니다.<br><br>
+        <span class="key">Closed (정상)</span> — 모든 요청을 통과시키며 실패율을 모니터링합니다.<br>
+        <span class="key">Open (차단)</span> — 설정된 실패율 임계치(예: 50%) 초과 시 전환. 이후 모든 요청을 즉시 실패 처리하고 Fallback 응답을 반환합니다. 다운스트림 서비스 부하를 줄이고 시스템이 복구할 시간을 줍니다.<br>
+        <span class="key">Half-Open (테스트)</span> — Open 상태에서 일정 시간 후 소수의 요청을 허용. 성공하면 Closed로, 실패하면 Open으로 돌아갑니다.<br><br>
+        Spring Boot에서는 <span class="em">Resilience4j</span>를 주로 사용합니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q03</span>API Gateway와 Service Mesh의 차이점은 무엇인가요?</div>
+      <div class="qa-a">
+        두 가지 모두 네트워크 제어 계층이지만 동작하는 위치와 목적이 다릅니다.<br><br>
+        <span class="key">API Gateway</span> — 외부(North-South) 트래픽 처리. 클라이언트와 내부 서비스 사이의 단일 진입점. 인증/인가, 라우팅, Rate Limiting, SSL 종단을 담당합니다.<br>
+        <span class="key">Service Mesh</span> — 내부(East-West) 트래픽 처리. 서비스 간 통신을 제어. 사이드카 프록시(Envoy)가 각 서비스 Pod에 주입되어 트래픽 암호화(mTLS), Circuit Breaker, 분산 추적을 제공합니다.<br><br>
+        실제로는 <span class="em">두 가지를 함께 사용</span>합니다. API Gateway(Kong/AWS API GW)가 외부 요청을 받고, 내부에서는 Istio 같은 Service Mesh가 서비스 간 통신을 관리합니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q04</span>MSA에서 데이터 일관성을 어떻게 보장하나요?</div>
+      <div class="qa-a">
+        MSA는 강한 일관성(Strong Consistency) 대신 <span class="em">최종 일관성(Eventual Consistency)</span>을 허용하는 것이 핵심입니다.<br><br>
+        <span class="key">Outbox Pattern</span> — DB 저장과 이벤트 발행을 하나의 로컬 트랜잭션으로 묶어 원자성 보장. Outbox 테이블에 이벤트 저장 후 CDC(Debezium)가 Kafka로 발행합니다.<br>
+        <span class="key">Idempotency(멱등성)</span> — 이벤트가 중복 전달되어도 같은 결과가 나오도록 설계. 이벤트 ID로 중복 처리 방지.<br>
+        <span class="key">CQRS + Event Sourcing</span> — 이벤트를 원천으로 읽기 모델을 독립적으로 구성.<br><br>
+        설계 시 "데이터가 얼마나 오래된 것을 허용할 수 있는가"를 먼저 결정하고, 비즈니스 요구사항에 따라 일관성 수준을 조정합니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q05</span>서비스 분리 기준은 무엇인가요? 너무 잘게 쪼개면 문제가 생기나요?</div>
+      <div class="qa-a">
+        <span class="em">DDD의 Bounded Context</span>가 가장 좋은 분리 단위입니다. 단일 책임, 독립 배포 가능성, 팀 소유권을 기준으로 판단합니다.<br><br>
+        <span class="key">너무 잘게 분리하면(Nano Service Anti-pattern)</span> — 네트워크 홉 증가로 지연(Latency) 누적, 운영 복잡도 폭증, 트랜잭션 경계가 과도하게 분산, 팀 오버헤드 증가 문제가 생깁니다.<br><br>
+        반면 <span class="key">너무 크게 유지하면(Distributed Monolith)</span> — 서비스 간 강한 결합으로 독립 배포의 장점을 잃습니다.<br><br>
+        이상적인 크기는 "<span class="em">두 피자 팀(2 Pizza Team)</span>"이 소유할 수 있는 서비스. 실제 데이터 변경 패턴과 팀 구조를 함께 고려해 결정합니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q06</span>MSA 환경에서 로그를 어떻게 추적하나요?</div>
+      <div class="qa-a">
+        여러 서비스에 분산된 로그를 추적하려면 <span class="em">Correlation ID(Trace ID)</span>를 모든 요청에 전파해야 합니다.<br><br>
+        <span class="key">구조화 로그(JSON)</span> — 모든 로그를 JSON 형태로 출력해 파싱 용이하게 합니다.<br>
+        <span class="key">MDC(Mapped Diagnostic Context)</span> — Spring + Logback에서 Trace ID를 스레드 로컬에 저장하여 모든 로그에 자동 포함.<br>
+        <span class="key">중앙 집중 로그</span> — Filebeat → Logstash → Elasticsearch → Kibana (ELK) 스택으로 수집, 검색, 시각화.<br>
+        <span class="key">분산 추적</span> — Spring Cloud Sleuth가 자동으로 Trace ID/Span ID를 주입하고 Zipkin에 전송. 서비스 간 호출 체인을 시각화합니다.
+      </div>
+    </div>
+
+    <div class="qa-block">
+      <div class="qa-q"><span class="qa-q-num">Q07</span>모놀리스에서 MSA로 전환할 때 전략은?</div>
+      <div class="qa-a">
+        <span class="em">Strangler Fig Pattern</span>이 가장 현실적인 전략입니다. 모놀리스를 한 번에 전환하는 Big Bang 방식은 위험이 높습니다.<br><br>
+        <span class="key">1단계</span> — API Gateway(또는 Nginx)를 모놀리스 앞에 배치. 모든 트래픽이 Gateway를 통과하도록 변경.<br>
+        <span class="key">2단계</span> — 신규 기능을 별도 서비스로 개발하고 Gateway에서 라우팅.<br>
+        <span class="key">3단계</span> — 기존 기능을 점진적으로 서비스로 추출. 데이터 마이그레이션 포함.<br>
+        <span class="key">4단계</span> — 모놀리스 비중이 줄어들면 최종 제거.<br><br>
+        <span class="em">DB 분리</span>가 가장 어렵습니다. 공유 DB 단계 → 별도 스키마 단계 → 별도 DB 단계로 점진적으로 분리합니다.
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  function toggleNav() {
+    document.getElementById('hamburgerBtn').classList.toggle('open');
+    document.getElementById('navOverlay').classList.toggle('open');
+    document.getElementById('sideNav').classList.toggle('open');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      if (a.getAttribute('href') === page) a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

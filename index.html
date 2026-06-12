@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Java 아키텍처 면접 치트시트</title>
+<title>Java 아키텍처 치트시트</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -713,6 +713,7 @@
     <li><a href="db.html">데이터베이스</a></li>
     <li><a href="ds.html">자료구조</a></li>
     <li><a href="traffic.html">대용량 트래픽</a></li>
+    <li><a href="msa.html">MSA 아키텍처</a></li>
   </ul>
 </nav>
 <div class="container">
@@ -721,7 +722,7 @@
   <header>
     <div class="label">// INTERVIEW PREP — BACKEND</div>
     <h1>Java 앱<br>아키텍처</h1>
-    <p class="subtitle">설계 원칙 · 레이어 구조 · 디자인 패턴 · 면접 핵심</p>
+    <p class="subtitle">객체지향 · JVM 구조 · 메모리 모델 · 디자인 패턴 · 설계 원칙</p>
   </header>
 
   <!-- LAYERED ARCHITECTURE -->
@@ -737,12 +738,12 @@
       <div class="layer-body">
         <div class="layer-desc">사용자 요청을 받고 응답을 반환. 비즈니스 로직 없이 입력 검증과 포맷 변환만 담당.</div>
         <div class="component-row">
-          <span class="comp-chip">@RestController</span>
-          <span class="comp-chip">@RequestMapping</span>
-          <span class="comp-chip">@Valid</span>
+          <span class="comp-chip">Interface (Handler)</span>
+          <span class="comp-chip">HttpServlet</span>
           <span class="comp-chip">DTO</span>
-          <span class="comp-chip dim">HTTP Request/Response</span>
-          <span class="comp-chip dim">JSON 직렬화</span>
+          <span class="comp-chip">Validation</span>
+          <span class="comp-chip dim">Request / Response</span>
+          <span class="comp-chip dim">직렬화 / 역직렬화</span>
         </div>
       </div>
     </div>
@@ -754,14 +755,14 @@
         <div class="layer-kr">비즈니스 계층</div>
       </div>
       <div class="layer-body">
-        <div class="layer-desc">핵심 비즈니스 로직 처리. 트랜잭션 관리. 계층 간 조정자 역할. 인프라에 의존하지 않음.</div>
+        <div class="layer-desc">핵심 비즈니스 로직 처리. 도메인 객체가 중심. 인프라(DB·외부 API)에 의존하지 않음.</div>
         <div class="component-row">
-          <span class="comp-chip">@Service</span>
-          <span class="comp-chip">@Transactional</span>
+          <span class="comp-chip">Domain Object</span>
           <span class="comp-chip">UseCase Interface</span>
+          <span class="comp-chip">Abstract Class</span>
           <span class="comp-chip dim">비즈니스 규칙</span>
-          <span class="comp-chip dim">도메인 로직</span>
-          <span class="comp-chip dim">예외 처리</span>
+          <span class="comp-chip dim">Checked Exception</span>
+          <span class="comp-chip dim">Value Object</span>
         </div>
       </div>
     </div>
@@ -773,14 +774,14 @@
         <div class="layer-kr">퍼시스턴스 계층</div>
       </div>
       <div class="layer-body">
-        <div class="layer-desc">데이터 접근 추상화. DB 쿼리, ORM 매핑. Repository 패턴으로 비즈니스 계층에서 DB 분리.</div>
+        <div class="layer-desc">데이터 접근 추상화. DAO 패턴으로 DB 기술을 비즈니스 계층과 분리. JDBC 위에서 동작.</div>
         <div class="component-row">
-          <span class="comp-chip">@Repository</span>
-          <span class="comp-chip">JpaRepository</span>
-          <span class="comp-chip">@Entity</span>
-          <span class="comp-chip">JPQL</span>
-          <span class="comp-chip dim">ORM 매핑</span>
-          <span class="comp-chip dim">QueryDSL</span>
+          <span class="comp-chip">DAO Pattern</span>
+          <span class="comp-chip">JDBC</span>
+          <span class="comp-chip">PreparedStatement</span>
+          <span class="comp-chip">ResultSet</span>
+          <span class="comp-chip dim">Connection Pool</span>
+          <span class="comp-chip dim">ORM</span>
         </div>
       </div>
     </div>
@@ -792,96 +793,96 @@
         <div class="layer-kr">데이터베이스 계층</div>
       </div>
       <div class="layer-body">
-        <div class="layer-desc">실제 데이터 저장소. 관계형 DB, NoSQL 등. 스키마 설계, 인덱스, 정규화가 핵심.</div>
+        <div class="layer-desc">실제 데이터 저장소. JDBC Driver가 Java와 DB 사이를 연결. 스키마 설계와 인덱스가 핵심.</div>
         <div class="component-row">
-          <span class="comp-chip">MySQL / PostgreSQL</span>
-          <span class="comp-chip">Redis</span>
-          <span class="comp-chip">MongoDB</span>
-          <span class="comp-chip dim">Connection Pool</span>
+          <span class="comp-chip">JDBC Driver</span>
+          <span class="comp-chip">DataSource</span>
+          <span class="comp-chip">SQL</span>
+          <span class="comp-chip dim">MySQL / PostgreSQL</span>
           <span class="comp-chip dim">Index</span>
-          <span class="comp-chip dim">트랜잭션</span>
+          <span class="comp-chip dim">Transaction</span>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- REQUEST FLOW -->
-  <div class="section-title">요청 흐름 다이어그램</div>
+  <!-- JVM EXECUTION FLOW -->
+  <div class="section-title">JVM 실행 흐름</div>
   <div class="flow-diagram">
-    <div class="flow-title">// HTTP REQUEST → RESPONSE CYCLE</div>
+    <div class="flow-title">// JAVA SOURCE → JVM EXECUTION CYCLE</div>
     <div class="flow-track">
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #c77dff;">
-          <div class="flow-box-icon">🌐</div>
-          <span class="flow-box-name">Client</span>
-          <span class="flow-box-sub">Browser / App</span>
+          <div class="flow-box-icon">📝</div>
+          <span class="flow-box-name">Source</span>
+          <span class="flow-box-sub">.java 파일</span>
         </div>
       </div>
 
       <div class="flow-arrow">
         <div class="arrow-line"></div>
-        <div class="arrow-label">HTTP POST</div>
+        <div class="arrow-label">javac 컴파일</div>
       </div>
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #4cc9f0;">
-          <div class="flow-box-icon">🛡</div>
-          <span class="flow-box-name">Filter</span>
-          <span class="flow-box-sub">Security / CORS</span>
+          <div class="flow-box-icon">📦</div>
+          <span class="flow-box-name">Bytecode</span>
+          <span class="flow-box-sub">.class 파일</span>
         </div>
       </div>
 
       <div class="flow-arrow">
         <div class="arrow-line"></div>
-        <div class="arrow-label">인증 통과</div>
+        <div class="arrow-label">로딩 / 링킹</div>
       </div>
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #f72585;">
-          <div class="flow-box-icon">🎮</div>
-          <span class="flow-box-name">Controller</span>
-          <span class="flow-box-sub">@RestController</span>
+          <div class="flow-box-icon">🔄</div>
+          <span class="flow-box-name">ClassLoader</span>
+          <span class="flow-box-sub">Bootstrap / App</span>
         </div>
       </div>
 
       <div class="flow-arrow">
         <div class="arrow-line"></div>
-        <div class="arrow-label">DTO 변환</div>
+        <div class="arrow-label">메모리 적재</div>
       </div>
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #ffd60a;">
-          <div class="flow-box-icon">⚙️</div>
-          <span class="flow-box-name">Service</span>
-          <span class="flow-box-sub">@Transactional</span>
+          <div class="flow-box-icon">🧠</div>
+          <span class="flow-box-name">Runtime</span>
+          <span class="flow-box-sub">Heap / Stack</span>
         </div>
       </div>
 
       <div class="flow-arrow">
         <div class="arrow-line"></div>
-        <div class="arrow-label">Repository</div>
+        <div class="arrow-label">해석 / JIT</div>
       </div>
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #00f5d4;">
-          <div class="flow-box-icon">🗄️</div>
-          <span class="flow-box-name">DB</span>
-          <span class="flow-box-sub">JPA / SQL</span>
+          <div class="flow-box-icon">⚡</div>
+          <span class="flow-box-name">Execution</span>
+          <span class="flow-box-sub">Interpreter / JIT</span>
         </div>
       </div>
 
       <div class="flow-arrow">
         <div class="arrow-line"></div>
-        <div class="arrow-label">Entity 반환</div>
+        <div class="arrow-label">시스템 호출</div>
       </div>
 
       <div class="flow-node">
         <div class="flow-box" style="--fn-color: #ff9f1c;">
-          <div class="flow-box-icon">📦</div>
-          <span class="flow-box-name">Response</span>
-          <span class="flow-box-sub">200 OK / JSON</span>
+          <div class="flow-box-icon">🖥️</div>
+          <span class="flow-box-name">Native</span>
+          <span class="flow-box-sub">OS / Hardware</span>
         </div>
       </div>
 
@@ -890,46 +891,46 @@
 
   <div class="divider"></div>
 
-  <!-- SPRING LIFECYCLE -->
-  <div class="section-title">Spring Bean 생명주기</div>
+  <!-- JAVA CLASS LIFECYCLE -->
+  <div class="section-title">Java 클래스 생명주기</div>
   <div class="lifecycle-wrap">
-    <div class="lifecycle-title">// BEAN LIFECYCLE — IoC 컨테이너가 관리하는 전체 흐름</div>
+    <div class="lifecycle-title">// CLASS LIFECYCLE — JVM이 클래스를 로드하고 실행하는 전체 흐름</div>
     <div class="lifecycle-steps">
 
       <div class="lc-step" style="--lc-color: #4cc9f0;">
-        <div class="lc-dot">📋</div>
-        <div class="lc-name">설정 로딩</div>
-        <div class="lc-desc">@Configuration<br>@ComponentScan</div>
+        <div class="lc-dot">📂</div>
+        <div class="lc-name">Loading</div>
+        <div class="lc-desc">ClassLoader가<br>.class 파일 탐색·로드</div>
       </div>
 
       <div class="lc-step" style="--lc-color: #7209b7;">
-        <div class="lc-dot">🏭</div>
-        <div class="lc-name">Bean 생성</div>
-        <div class="lc-desc">BeanFactory<br>인스턴스화</div>
+        <div class="lc-dot">🔗</div>
+        <div class="lc-name">Linking</div>
+        <div class="lc-desc">Verify · Prepare<br>Resolve (심볼 해결)</div>
       </div>
 
       <div class="lc-step" style="--lc-color: #f72585;">
-        <div class="lc-dot">💉</div>
-        <div class="lc-name">의존성 주입</div>
-        <div class="lc-desc">@Autowired<br>생성자 주입</div>
+        <div class="lc-dot">⚡</div>
+        <div class="lc-name">Initialization</div>
+        <div class="lc-desc">static 블록 실행<br>static 필드 초기화</div>
       </div>
 
       <div class="lc-step" style="--lc-color: #ffd60a;">
-        <div class="lc-dot">⚡</div>
-        <div class="lc-name">초기화</div>
-        <div class="lc-desc">@PostConstruct<br>afterPropertiesSet</div>
+        <div class="lc-dot">🏗</div>
+        <div class="lc-name">Instantiation</div>
+        <div class="lc-desc">new → Heap 할당<br>생성자(constructor) 호출</div>
       </div>
 
       <div class="lc-step" style="--lc-color: #00f5d4;">
         <div class="lc-dot">✅</div>
-        <div class="lc-name">사용 준비</div>
-        <div class="lc-desc">ApplicationContext<br>getBean()</div>
+        <div class="lc-name">In Use</div>
+        <div class="lc-desc">Stack에 참조 유지<br>메서드 호출·상태 변경</div>
       </div>
 
       <div class="lc-step" style="--lc-color: #80ffdb;">
-        <div class="lc-dot">🗑</div>
-        <div class="lc-name">소멸</div>
-        <div class="lc-desc">@PreDestroy<br>destroy()</div>
+        <div class="lc-dot">♻️</div>
+        <div class="lc-name">GC</div>
+        <div class="lc-desc">참조 없음 → Unreachable<br>GC가 Heap 메모리 회수</div>
       </div>
 
     </div>
@@ -1147,99 +1148,132 @@
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.01</span>
-        레이어드 아키텍처에서 각 계층의 역할은?
+        JVM 구조를 설명하세요
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"Presentation → Business → Persistence → DB 순으로 단방향 의존합니다.</span><br>
-        Presentation은 요청/응답 처리, Business는 핵심 로직과 트랜잭션, Persistence는 DB 추상화, DB는 실제 데이터 저장을 담당합니다.<br>
-        각 계층은 바로 아래 계층만 참조해 결합도를 낮춥니다."
+        <span class="hl">"JVM은 ClassLoader, Runtime Data Area, Execution Engine, Native Interface로 구성됩니다."</span><br>
+        ClassLoader가 .class 파일을 로드해 메모리에 적재하고, Execution Engine(Interpreter + JIT Compiler)이 바이트코드를 실행합니다.<br>
+        Runtime Data Area는 <span class="hl">Heap(객체)</span>, <span class="hl">Stack(메서드 프레임)</span>, <span class="hl">Method Area(클래스 메타·static)</span>, <span class="hl">PC Register</span>, <span class="hl">Native Method Stack</span>으로 나뉩니다.
       </div>
     </div>
 
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.02</span>
-        @Transactional 동작 원리는?
+        인터페이스와 추상 클래스의 차이는?
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"Spring AOP의 Proxy 패턴으로 동작합니다."</span><br>
-        @Transactional이 붙은 메서드 호출 시, Spring이 만든 프록시 객체가 트랜잭션 시작 → 실제 메서드 실행 → 커밋/롤백 순으로 처리합니다.<br>
+        <span class="hl">"인터페이스는 '무엇을 할 수 있는가(능력)', 추상 클래스는 '무엇인가(본질)'를 표현합니다."</span>
         <div class="code-block">
-<span class="cm">// 같은 클래스 내 self-call은 프록시를 거치지 않아 트랜잭션 적용 X</span>
-<span class="kw">public class</span> <span class="cl">OrderService</span> {
-  <span class="an">@Transactional</span>
-  <span class="kw">public void</span> createOrder() { <span class="cm">// ✅ 프록시 통과</span>
-    saveOrder(); <span class="cm">// ❌ self-call — 트랜잭션 미적용</span>
-  }
+<span class="cm">// 인터페이스: 다중 구현 가능, 상태(필드) 없음, IS-ABLE-TO 관계</span>
+<span class="kw">interface</span> <span class="cl">Flyable</span> { <span class="kw">void</span> fly(); }
+<span class="kw">interface</span> <span class="cl">Swimmable</span> { <span class="kw">void</span> swim(); }
+<span class="kw">class</span> <span class="cl">Duck</span> <span class="kw">implements</span> <span class="cl">Flyable</span>, <span class="cl">Swimmable</span> { ... }
+
+<span class="cm">// 추상 클래스: 단일 상속, 상태·공통 구현 공유, IS-A 관계</span>
+<span class="kw">abstract class</span> <span class="cl">Animal</span> {
+  <span class="kw">protected</span> String name; <span class="cm">// 공통 상태</span>
+  <span class="kw">abstract void</span> sound(); <span class="cm">// 서브클래스 구현 강제</span>
 }
         </div>
+        Java 8+ 이후 인터페이스도 <span class="hl">default/static 메서드</span>를 가질 수 있어 차이가 줄었지만, 상태(인스턴스 필드) 보유 여부와 IS-A vs IS-ABLE-TO 의미가 핵심 구분점입니다.
       </div>
     </div>
 
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.03</span>
-        DI(의존성 주입) 방식 3가지와 권장 방식은?
+        equals()와 ==의 차이, hashCode() 계약은?
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"생성자 주입, 필드 주입, Setter 주입이 있습니다. 생성자 주입이 권장됩니다."</span>
+        <span class="hl">"==은 참조(주소) 비교, equals()는 값(내용) 비교입니다."</span>
         <div class="code-block">
-<span class="cm">// ✅ 권장: 생성자 주입 — 불변, 테스트 용이, 순환 의존 감지</span>
-<span class="kw">private final</span> <span class="cl">UserRepository</span> repo;
-<span class="kw">public</span> <span class="cl">UserService</span>(<span class="cl">UserRepository</span> repo) { <span class="kw">this</span>.repo = repo; }
+<span class="cl">String</span> a = <span class="kw">new</span> <span class="cl">String</span>(<span class="st">"hello"</span>);
+<span class="cl">String</span> b = <span class="kw">new</span> <span class="cl">String</span>(<span class="st">"hello"</span>);
+a == b       <span class="cm">// false — 다른 객체</span>
+a.equals(b)  <span class="cm">// true  — 값 동일</span>
 
-<span class="cm">// ❌ 비권장: 필드 주입 — 테스트 어렵고 순환 참조 런타임 오류</span>
-<span class="an">@Autowired</span> <span class="kw">private</span> <span class="cl">UserRepository</span> repo;
+<span class="cm">// hashCode 계약: equals()가 true면 hashCode()도 반드시 같아야 함</span>
+<span class="cm">// HashMap/HashSet은 hashCode로 버킷 찾고, equals로 동등성 확인</span>
         </div>
+        equals를 재정의할 때 hashCode도 반드시 함께 재정의해야 합니다. 그렇지 않으면 HashMap에서 동등한 키가 다른 버킷에 저장되어 <span class="hl">조회 실패</span>가 발생합니다.
       </div>
     </div>
 
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.04</span>
-        Entity와 DTO를 왜 분리하나요?
+        불변 객체(Immutable Object)를 만드는 방법은?
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"Entity는 DB 테이블과 직접 매핑되어 변경이 민감하고, DTO는 계층 간 데이터 전송 전용입니다."</span><br>
-        Entity를 직접 반환하면 불필요한 컬럼 노출, 양방향 순환 참조, API 스펙과 DB 스키마 강결합 문제가 발생합니다.<br>
-        분리하면 API 변경 시 Entity를 건드리지 않아도 되며, 보안과 유지보수가 향상됩니다.
+        <span class="hl">"클래스를 final 선언, 모든 필드를 private final, 생성자에서만 초기화, setter 제거, 방어적 복사를 적용합니다."</span>
+        <div class="code-block">
+<span class="kw">public final class</span> <span class="cl">Money</span> {
+  <span class="kw">private final int</span> amount;
+  <span class="kw">private final</span> <span class="cl">Currency</span> currency;
+
+  <span class="kw">public</span> <span class="cl">Money</span>(<span class="kw">int</span> amount, <span class="cl">Currency</span> currency) {
+    <span class="kw">this</span>.amount = amount;
+    <span class="kw">this</span>.currency = currency;
+  }
+  <span class="cm">// getter만 제공, setter 없음</span>
+  <span class="cm">// 변경이 필요하면 새 Money 객체 반환</span>
+  <span class="kw">public</span> <span class="cl">Money</span> add(<span class="kw">int</span> val) { <span class="kw">return new</span> <span class="cl">Money</span>(amount + val, currency); }
+}
+        </div>
+        불변 객체는 <span class="hl">Thread-safe</span>, 캐싱 가능, 부작용 없음의 장점이 있어 Value Object와 함수형 스타일 설계에 적합합니다.
       </div>
     </div>
 
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.05</span>
-        Strategy 패턴을 실무에서 어떻게 적용했나요?
+        제네릭(Generics)의 목적과 타입 소거(Type Erasure)란?
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"결제 방식 처리에 Strategy 패턴을 적용했습니다."</span>
+        <span class="hl">"제네릭은 컴파일 타임 타입 안전성을 보장하고 형변환(casting) 코드를 제거합니다."</span>
         <div class="code-block">
-<span class="kw">interface</span> <span class="cl">PaymentStrategy</span> { <span class="kw">void</span> pay(<span class="kw">int</span> amount); }
+<span class="cm">// 제네릭 없이 — 런타임 ClassCastException 위험</span>
+<span class="cl">List</span> list = <span class="kw">new</span> <span class="cl">ArrayList</span>();
+list.add(<span class="st">"hello"</span>);
+<span class="cl">Integer</span> i = (<span class="cl">Integer</span>) list.get(0); <span class="cm">// 런타임 오류!</span>
 
-<span class="an">@Component</span> <span class="kw">class</span> <span class="cl">CardPayment</span> <span class="kw">implements</span> <span class="cl">PaymentStrategy</span> { ... }
-<span class="an">@Component</span> <span class="kw">class</span> <span class="cl">KakaoPayment</span> <span class="kw">implements</span> <span class="cl">PaymentStrategy</span> { ... }
-
-<span class="cm">// PaymentType Enum으로 전략 선택 → if/else 제거, OCP 준수</span>
+<span class="cm">// 제네릭 사용 — 컴파일 타임에 타입 오류 감지</span>
+<span class="cl">List</span>&lt;<span class="cl">String</span>&gt; list = <span class="kw">new</span> <span class="cl">ArrayList</span>&lt;&gt;();
+list.add(<span class="st">"hello"</span>);
+<span class="cl">String</span> s = list.get(0); <span class="cm">// 형변환 불필요</span>
         </div>
-        새로운 결제 수단 추가 시 기존 코드를 수정하지 않고 클래스만 추가하면 되어 확장에 유리합니다.
+        <span class="hl">타입 소거(Type Erasure)</span>: 컴파일 후 제네릭 타입 정보는 제거되어 런타임에는 Raw Type으로 동작합니다. 따라서 <span class="hl">instanceof List&lt;String&gt;</span> 같은 런타임 타입 검사는 불가능합니다.
       </div>
     </div>
 
     <div class="qa-item" onclick="toggle(this)">
       <div class="qa-q">
         <span class="qa-badge">Q.06</span>
-        MSA vs 모놀리식 아키텍처 차이는?
+        Java에서 동기화(Synchronization) 처리 방법은?
         <span class="qa-chevron">▼</span>
       </div>
       <div class="qa-a">
-        <span class="hl">"모놀리식은 단일 배포 단위로 개발이 단순하지만, 규모가 커지면 배포·확장이 어렵습니다."</span><br>
-        MSA는 서비스별 독립 배포·확장·기술 스택 선택이 가능하지만 네트워크 지연, 분산 트랜잭션, 운영 복잡도가 증가합니다.<br>
-        초기에는 모놀리식으로 시작해 경계가 명확해지면 MSA로 분리하는 것을 권장합니다.
+        <span class="hl">"synchronized 키워드, volatile, java.util.concurrent 패키지 등을 상황에 맞게 사용합니다."</span>
+        <div class="code-block">
+<span class="cm">// synchronized — 메서드/블록 단위 상호 배제(mutual exclusion)</span>
+<span class="kw">public synchronized void</span> increment() { count++; }
+
+<span class="cm">// volatile — 가시성 보장(캐시 미사용, 메인 메모리 직접 읽기)</span>
+<span class="kw">private volatile boolean</span> running = <span class="kw">true</span>;
+
+<span class="cm">// AtomicInteger — CAS(Compare-And-Swap) 기반 락 없는 원자 연산</span>
+<span class="cl">AtomicInteger</span> count = <span class="kw">new</span> <span class="cl">AtomicInteger</span>(0);
+count.incrementAndGet(); <span class="cm">// Thread-safe</span>
+
+<span class="cm">// ReentrantLock — synchronized보다 세밀한 락 제어</span>
+        </div>
+        <span class="hl">volatile</span>은 가시성만 보장(원자성 X), <span class="hl">synchronized</span>는 원자성+가시성 모두 보장하지만 성능 비용이 있습니다. 고성능이 필요하면 <span class="hl">java.util.concurrent</span> 패키지를 우선 검토합니다.
       </div>
     </div>
 
@@ -1247,7 +1281,7 @@
 
 </div>
 
-<footer>// JAVA APPLICATION ARCHITECTURE CHEATSHEET &nbsp;·&nbsp; SPRING BOOT · JPA · DESIGN PATTERNS 🚀</footer>
+<footer>// JAVA ARCHITECTURE CHEATSHEET &nbsp;·&nbsp; JVM · OOP · DESIGN PATTERNS · SOLID</footer>
 
 <script>
   function toggle(el) {
