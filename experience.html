@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS 실무 경험 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --accent5: #4cc9f0;
+    --accent6: #c77dff;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 72px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 7vw, 88px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent5) 40%, var(--accent1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent5);
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .tag-green  { background: rgba(0,245,212,0.1);   color: var(--accent1); border: 1px solid rgba(0,245,212,0.2); }
+  .tag-pink   { background: rgba(247,37,133,0.1);  color: var(--accent2); border: 1px solid rgba(247,37,133,0.2); }
+  .tag-yellow { background: rgba(255,214,10,0.1);  color: var(--accent3); border: 1px solid rgba(255,214,10,0.2); }
+  .tag-blue   { background: rgba(76,201,240,0.1);  color: var(--accent5); border: 1px solid rgba(76,201,240,0.2); }
+  .tag-purple { background: rgba(199,125,255,0.1); color: var(--accent6); border: 1px solid rgba(199,125,255,0.2); }
+  .tag-orange { background: rgba(255,100,20,0.1);  color: #ff8c42;        border: 1px solid rgba(255,100,20,0.2); }
+
+  /* Grid */
+  .grid-2    { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(76,201,240,0.3); transform: translateY(-2px); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .card.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .card.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card.c-purple::before { background: linear-gradient(90deg, var(--accent6), transparent); }
+  .card.c-orange::before { background: linear-gradient(90deg, #ff8c42, transparent); }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .card.c-green  .card-title { color: var(--accent1); }
+  .card.c-pink   .card-title { color: var(--accent2); }
+  .card.c-yellow .card-title { color: var(--accent3); }
+  .card.c-blue   .card-title { color: var(--accent5); }
+  .card.c-purple .card-title { color: var(--accent6); }
+  .card.c-orange .card-title { color: #ff8c42; }
+
+  /* Lists */
+  ul.dot-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.dot-list li {
+    font-size: 13px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.6;
+  }
+  ul.dot-list li::before { content: '▸'; position: absolute; left: 0; color: var(--accent1); font-size: 10px; top: 3px; }
+  ul.dot-list.pink li::before   { color: var(--accent2); }
+  ul.dot-list.yellow li::before { color: var(--accent3); }
+  ul.dot-list.blue li::before   { color: var(--accent5); }
+  ul.dot-list.purple li::before { color: var(--accent6); }
+  ul.dot-list.orange li::before { color: #ff8c42; }
+
+  /* Memo */
+  .memo {
+    background: rgba(255,214,10,0.04);
+    border: 1px solid rgba(255,214,10,0.15);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c0c0a0;
+    margin-top: 12px;
+  }
+  .memo strong { color: var(--accent3); }
+  .memo.blue { background: rgba(76,201,240,0.04); border-color: rgba(76,201,240,0.15); border-left-color: var(--accent5); color: #a0c0d0; }
+  .memo.blue strong { color: var(--accent5); }
+  .memo.pink { background: rgba(247,37,133,0.04); border-color: rgba(247,37,133,0.15); border-left-color: var(--accent2); color: #d0a0b0; }
+  .memo.pink strong { color: var(--accent2); }
+  .memo.green { background: rgba(0,245,212,0.04); border-color: rgba(0,245,212,0.15); border-left-color: var(--accent1); color: #a0d0c8; }
+  .memo.green strong { color: var(--accent1); }
+  .memo.purple { background: rgba(199,125,255,0.04); border-color: rgba(199,125,255,0.15); border-left-color: var(--accent6); color: #c0a0d8; }
+  .memo.purple strong { color: var(--accent6); }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .badge.g  { background: rgba(0,245,212,0.15);   color: var(--accent1); }
+  .badge.p  { background: rgba(247,37,133,0.15);  color: var(--accent2); }
+  .badge.y  { background: rgba(255,214,10,0.15);  color: var(--accent3); }
+  .badge.b  { background: rgba(76,201,240,0.15);  color: var(--accent5); }
+  .badge.v  { background: rgba(199,125,255,0.15); color: var(--accent6); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+  .slabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .hl { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .hl.g { color: var(--accent1); }
+  .hl.p { color: var(--accent2); }
+  .hl.y { color: var(--accent3); }
+  .hl.b { color: var(--accent5); }
+  .hl.v { color: var(--accent6); }
+  .hl.o { color: #ff8c42; }
+
+  /* ── PIPELINE FLOW ── */
+  .pipeline-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .pipe-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 160px;
+    flex: 1;
+  }
+
+  .pipe-box {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .pipe-box:hover { box-shadow: 0 0 16px rgba(76,201,240,0.15); }
+  .pipe-box::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 2px; border-radius: 0 0 4px 4px; }
+
+  .pipe-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .pipe-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .pipe-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .pipe-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: -20px;
+  }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .arch-row {
+    display: grid;
+    border-bottom: 1px solid var(--border);
+  }
+  .arch-row:last-child { border-bottom: none; }
+  .arch-row.cols-1 { grid-template-columns: 1fr; }
+  .arch-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .arch-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .arch-cell {
+    padding: 18px 20px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .arch-cell:last-child { border-right: none; }
+
+  .arch-cell-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .arch-cell-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .arch-cell-body strong { color: var(--text); }
+
+  .arch-zone-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* ── TROUBLESHOOT ── */
+  .ts-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: start;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+
+  .ts-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+  }
+  .ts-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 10px 10px 0 0; }
+  .ts-box.problem::before  { background: var(--accent2); }
+  .ts-box.cause::before    { background: var(--accent3); }
+  .ts-box.solution::before { background: var(--accent1); }
+
+  .ts-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .ts-box.problem  .ts-label { color: var(--accent2); }
+  .ts-box.cause    .ts-label { color: var(--accent3); }
+  .ts-box.solution .ts-label { color: var(--accent1); }
+
+  .ts-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    color: var(--muted);
+    font-size: 20px;
+    padding-top: 30px;
+  }
+
+  /* ── SQS FLOW ── */
+  .sqs-flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .sqs-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .sqs-box {
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 90px;
+    border: 1.5px solid;
+  }
+  .sqs-box .sqs-icon { font-size: 20px; margin-bottom: 4px; }
+  .sqs-box .sqs-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .sqs-arrow { color: var(--muted); font-size: 16px; }
+
+  /* ── MIGRATION STEPS ── */
+  .migration-steps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .migration-steps::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 32px;
+    bottom: 32px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent5), var(--accent6), var(--accent1));
+    opacity: 0.3;
+  }
+
+  .step-item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 20px;
+    padding: 16px 0;
+  }
+
+  .step-num {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    border: 2px solid;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .step-body {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    transition: border-color 0.2s;
+  }
+  .step-body:hover { border-color: rgba(76,201,240,0.3); }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .step-desc strong { color: var(--text); }
+
+  /* ── LEADERSHIP PILLARS ── */
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .pillar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .pillar:hover { transform: translateY(-3px); }
+
+  .pillar-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+
+  .pillar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .pillar-body {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.65;
+    text-align: left;
+  }
+
+  .pillar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  /* ── RESULT BOX ── */
+  .result-box {
+    background: linear-gradient(135deg, rgba(0,245,212,0.05) 0%, rgba(76,201,240,0.05) 100%);
+    border: 1px solid rgba(0,245,212,0.2);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+
+  .result-box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    margin-bottom: 8px;
+  }
+
+  .result-box-body {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* ── FARGATE TABLE ── */
+  .when-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 12px;
+  }
+  .when-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    color: var(--accent5);
+  }
+  .when-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .when-table td:first-child { color: var(--text); width: 36px; text-align: center; }
+  .when-table tr:last-child td { border-bottom: none; }
+  .when-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.12s; }
+  .section:nth-child(3) { animation-delay: 0.19s; }
+  .section:nth-child(4) { animation-delay: 0.26s; }
+  .section:nth-child(5) { animation-delay: 0.33s; }
+
+  /* ── HAMBURGER NAV ── */
+  .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
+  .hamburger-btn:hover { border-color: var(--accent6); box-shadow: 0 0 12px rgba(199,125,255,0.3); }
+  .hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--accent6); border-radius: 2px; transition: all 0.3s ease; }
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(2px); }
+  .nav-overlay.open { display: block; }
+  .side-nav { position: fixed; top: 0; right: -280px; width: 260px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 999; padding: 80px 24px 32px; transition: right 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .side-nav.open { right: 0; }
+  .nav-header { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .nav-links { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .nav-links a { display: block; padding: 12px 16px; color: var(--text); text-decoration: none; border-radius: 8px; font-size: 15px; transition: all 0.2s ease; border: 1px solid transparent; }
+  .nav-links a:hover { background: var(--card); border-color: var(--accent6); color: var(--accent6); }
+  .nav-links a.active { background: rgba(199,125,255,0.1); border-color: var(--accent6); color: var(--accent6); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .pillar-grid { grid-template-columns: 1fr; }
+    .ts-flow { grid-template-columns: 1fr; }
+    .ts-arrow { display: none; }
+    .arch-row.cols-2, .arch-row.cols-3 { grid-template-columns: 1fr; }
+    .arch-cell { border-right: none; border-bottom: 1px solid var(--border); }
+    .arch-cell:last-child { border-bottom: none; }
+    .pipeline-wrap { gap: 8px; flex-direction: column; }
+    .pipe-arrow { transform: rotate(90deg); margin: 0 auto; }
+    .migration-steps::before { left: 19px; }
+    .step-item { grid-template-columns: 40px 1fr; gap: 12px; }
+    .step-circle { width: 32px; height: 32px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleNav()" aria-label="메뉴">
+  <span></span><span></span><span></span>
+</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<nav class="side-nav" id="sideNav">
+  <div class="nav-header">치트시트</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Java 아키텍처</a></li>
+    <li><a href="spring.html">Spring</a></li>
+    <li><a href="gc.html">Java GC</a></li>
+    <li><a href="db.html">데이터베이스</a></li>
+    <li><a href="ds.html">자료구조</a></li>
+    <li><a href="traffic.html">대용량 트래픽</a></li>
+    <li><a href="msa.html">MSA 아키텍처</a></li>
+    <li><a href="performance.html">성능 &amp; 장애대응</a></li>
+    <li><a href="experience.html" class="active">AWS 실무 경험</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <header>
+    <div class="label">실무 경험 · AWS</div>
+    <h1>AWS 실무 경험</h1>
+    <div class="subtitle">배포 파이프라인 · 아키텍처 · 트러블슈팅 · 리딩 · 마이그레이션</div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 1 : 배포 파이프라인 자동화
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">배포 파이프라인 자동화</span>
+      <span class="section-tag tag-blue">CI/CD</span>
+    </div>
+
+    <!-- Pipeline flow -->
+    <div class="pipeline-wrap">
+      <div class="pipe-node">
+        <div class="pipe-box" style="border-color:rgba(76,201,240,0.4);">
+          <div class="pipe-box" style="background:none;border:none;padding:0;">
+            <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:50px;height:2px;background:var(--accent5);border-radius:0 0 4px 4px;"></div>
+          </div>
+          <div class="pipe-icon">📦</div>
+          <div class="pipe-name" style="color:var(--accent5);">Source</div>
+          <div class="pipe-desc">코드 변경 감지<br>CodeCommit / GitHub</div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pipe-box" style="border-color:rgba(255,214,10,0.4);">
+          <div class="pipe-icon">🔨</div>
+          <div class="pipe-name" style="color:var(--accent3);">CodeBuild</div>
+          <div class="pipe-desc">자동 빌드<br>결과 지속 모니터링<br>수동 오류 감소</div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pipe-box" style="border-color:rgba(0,245,212,0.4);">
+          <div class="pipe-icon">🚀</div>
+          <div class="pipe-name" style="color:var(--accent1);">CodeDeploy</div>
+          <div class="pipe-desc">자동 배포<br>Blue/Green 전략<br>카나리 테스트</div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pipe-box" style="border-color:rgba(199,125,255,0.4);">
+          <div class="pipe-icon">✅</div>
+          <div class="pipe-name" style="color:var(--accent6);">Production</div>
+          <div class="pipe-desc">무중단 배포<br>롤백 지원<br>빠른 복구</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="card c-yellow">
+        <div class="card-title">Blue/Green 배포 전략</div>
+        <ul class="dot-list yellow">
+          <li><strong>Blue (현재)</strong> → 운영 중인 환경에 트래픽 유지</li>
+          <li><strong>Green (신규)</strong> → 새 버전 배포 후 테스트 완료 시 트래픽 전환</li>
+          <li>전환 실패 시 Blue로 즉시 롤백 — <span class="hl y">무중단 보장</span></li>
+          <li>카나리: 일부 트래픽만 먼저 Green으로 → 점진적 검증</li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">CodePipeline 자동화 효과</div>
+        <ul class="dot-list blue">
+          <li>소스 변경 → 빌드 → 배포 <span class="hl b">완전 자동화</span></li>
+          <li>수동 배포 실수·지연 최소화</li>
+          <li>빌드 결과 지속적 모니터링으로 빠른 피드백</li>
+          <li>CI/CD 자동화로 개발·운영 효율성 크게 향상</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2 : 아키텍처 구성
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">아키텍처 구성 및 서비스 런칭</span>
+      <span class="section-tag tag-green">AWS Infra</span>
+    </div>
+
+    <!-- VPC Architecture Diagram -->
+    <div class="arch-diagram">
+      <div class="arch-zone-label">🌐 Internet</div>
+      <div class="arch-row cols-1">
+        <div class="arch-cell" style="background:rgba(76,201,240,0.04);">
+          <div class="arch-cell-title" style="color:var(--accent5);">
+            <span>⚖️</span> ALB — Application Load Balancer
+          </div>
+          <div class="arch-cell-body">
+            클라이언트 요청을 ECS Fargate 서비스로 라우팅 &nbsp;·&nbsp;
+            <strong>HTTPS 지원</strong> 보안 통신 &nbsp;·&nbsp;
+            고가용성 + 확장성 트래픽 분산
+          </div>
+        </div>
+      </div>
+      <div class="arch-zone-label">🔓 Public Subnet (외부 연결 담당)</div>
+      <div class="arch-row cols-1">
+        <div class="arch-cell" style="background:rgba(255,214,10,0.03);">
+          <div class="arch-cell-title" style="color:var(--accent3);">
+            <span>🐳</span> ECS + Fargate
+          </div>
+          <div class="arch-cell-body">
+            컨테이너 기반 애플리케이션 배포 &nbsp;·&nbsp;
+            <strong>서버리스</strong> — 인프라 관리 없이 컴퓨팅 리소스 자동 관리 &nbsp;·&nbsp;
+            유동적 Auto Scaling &nbsp;·&nbsp; SSH 없이 운영, VPC 격리 보안
+          </div>
+        </div>
+      </div>
+      <div class="arch-zone-label">🔒 Private Subnet (민감 서비스 격리)</div>
+      <div class="arch-row cols-2">
+        <div class="arch-cell" style="background:rgba(247,37,133,0.03);">
+          <div class="arch-cell-title" style="color:var(--accent2);">
+            <span>🔍</span> OpenSearch Service
+          </div>
+          <div class="arch-cell-body">
+            로그 데이터 <strong>실시간 분석 · 검색</strong><br>
+            대규모 로그 효과적 처리<br>
+            서비스 성능 인사이트 확보
+          </div>
+        </div>
+        <div class="arch-cell" style="background:rgba(0,245,212,0.03);">
+          <div class="arch-cell-title" style="color:var(--accent1);">
+            <span>📊</span> CloudWatch
+          </div>
+          <div class="arch-cell-body">
+            로그 · 모니터링 <strong>실시간 추적</strong><br>
+            시스템 성능 · 상태 모니터링<br>
+            자동 알림 → 장애 신속 대응
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fargate 적합 케이스 -->
+    <div class="card c-blue">
+      <div class="card-title">Fargate 가 적합한 경우</div>
+      <table class="when-table">
+        <thead>
+          <tr><th>✓</th><th>케이스</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>🖥️</td><td>EC2 인스턴스 관리 없이 컨테이너만 실행하고 싶을 때</td></tr>
+          <tr><td>📈</td><td>트래픽이 유동적이고 Auto Scaling이 중요한 경우 <span class="badge b">빠른 프로비저닝</span></td></tr>
+          <tr><td>🔐</td><td>보안이 중요한 경우 — SSH 없이 운영, VPC 격리</td></tr>
+          <tr><td>💰</td><td>초기 비용을 줄이고 사용한 만큼만 과금하고 싶을 때</td></tr>
+          <tr><td>⚙️</td><td>ECS/EKS를 사용하면서 운영 부담을 최소화하고 싶을 때</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="result-box" style="margin-top:16px;">
+      <div class="result-box-label">결과</div>
+      <div class="result-box-body">
+        고가용성 · 보안성 · 확장성을 갖춘 서비스 환경 구성. 자동화된 리소스 관리로 운영 효율성 향상.
+        각 서비스가 독립적이면서 유기적으로 연동되어 빠르고 안정적인 서비스 제공.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3 : 트러블슈팅
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">트러블슈팅 사례</span>
+      <span class="section-tag tag-pink">DB Connection Pool</span>
+    </div>
+
+    <!-- Problem → Cause → Solution -->
+    <div class="ts-flow">
+      <div class="ts-box problem">
+        <div class="ts-label">🔴 Problem</div>
+        <ul class="dot-list pink" style="font-size:12.5px;">
+          <li>DB Connection Pool 기본값 <strong>10개</strong></li>
+          <li>신규 서비스: DB 읽기/쓰기 + <strong>API 검색</strong>이 단일 트랜잭션</li>
+          <li>API 검색 지연 → 커넥션 선점 장기화</li>
+          <li>동시 요청 증가 → Pool 고갈 → <strong>DB 연결 오류</strong></li>
+          <li style="color:var(--accent2);">서버 다운</li>
+        </ul>
+      </div>
+      <div class="ts-arrow">→</div>
+      <div class="ts-box cause">
+        <div class="ts-label">🟡 Root Cause</div>
+        <ul class="dot-list yellow" style="font-size:12.5px;">
+          <li>하나의 트랜잭션이 <strong>DB 작업 + 외부 API 검색</strong>을 모두 포함</li>
+          <li>외부 API 지연 동안 DB 커넥션을 점유</li>
+          <li>Pool 크기 확장은 <strong>근본 해결책이 아님</strong></li>
+          <li>DB 작업과 API 검색 로직 분리 필요</li>
+        </ul>
+      </div>
+      <div class="ts-arrow">→</div>
+      <div class="ts-box solution">
+        <div class="ts-label">🟢 Solution</div>
+        <ul class="dot-list" style="font-size:12.5px;">
+          <li>DB 읽기/쓰기 ↔ API 검색 로직 <strong>분리</strong></li>
+          <li><strong>AWS SQS</strong> 도입으로 비동기 처리</li>
+          <li>클라이언트 요청 → 큐에 적재</li>
+          <li>큐에서 순차 폴링 → DB 작업 처리</li>
+          <li>커넥션 과점유 방지 + 안정성 확보</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SQS Flow Diagram -->
+    <div class="card c-green" style="margin-bottom:16px;">
+      <div class="card-title">SQS 비동기 처리 흐름</div>
+      <div class="sqs-flow">
+        <div class="sqs-node">
+          <div class="sqs-box" style="border-color:var(--accent5);background:rgba(76,201,240,0.1);">
+            <div class="sqs-icon">👤</div>
+            <div class="sqs-name" style="color:var(--accent5);">Client</div>
+          </div>
+        </div>
+        <div class="sqs-arrow">→</div>
+        <div class="sqs-node">
+          <div class="sqs-box" style="border-color:var(--accent3);background:rgba(255,214,10,0.1);">
+            <div class="sqs-icon">🖥️</div>
+            <div class="sqs-name" style="color:var(--accent3);">API Server</div>
+          </div>
+        </div>
+        <div class="sqs-arrow">→</div>
+        <div class="sqs-node">
+          <div class="sqs-box" style="border-color:var(--accent1);background:rgba(0,245,212,0.1);">
+            <div class="sqs-icon">📬</div>
+            <div class="sqs-name" style="color:var(--accent1);">SQS Queue</div>
+          </div>
+        </div>
+        <div class="sqs-arrow">→<br><span style="font-size:10px;color:var(--muted);">순차 폴링</span></div>
+        <div class="sqs-node">
+          <div class="sqs-box" style="border-color:var(--accent6);background:rgba(199,125,255,0.1);">
+            <div class="sqs-icon">⚙️</div>
+            <div class="sqs-name" style="color:var(--accent6);">Consumer</div>
+          </div>
+        </div>
+        <div class="sqs-arrow">→</div>
+        <div class="sqs-node">
+          <div class="sqs-box" style="border-color:var(--accent2);background:rgba(247,37,133,0.1);">
+            <div class="sqs-icon">🗄️</div>
+            <div class="sqs-name" style="color:var(--accent2);">DB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-purple">
+        <div class="card-title">SQS 장점</div>
+        <ul class="dot-list purple">
+          <li>높은 데이터 가용성 보장</li>
+          <li>순차적 폴링 → DB 과부하 방지</li>
+          <li>Pool 초과 요청도 큐에서 대기 후 처리</li>
+          <li>서버 안정성 확보</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">단점 &amp; 보완</div>
+        <ul class="dot-list pink">
+          <li>비동기 처리 → <strong>즉시 응답 불가</strong></li>
+          <li>신속 응답 필요 부분 → <span class="hl p">Redis 캐시</span> 도입</li>
+          <li>캐시 Hit → 빠른 응답 / Miss → Queue 처리</li>
+        </ul>
+        <div class="memo pink" style="margin-top:10px;">
+          <strong>핵심:</strong> SQS로 안정성 확보 + Redis로 응답 속도 보완 → 두 마리 토끼
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 4 : 리딩 경험
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">리딩 경험</span>
+      <span class="section-tag tag-purple">Team Lead</span>
+    </div>
+
+    <div class="pillar-grid">
+      <div class="pillar" style="border-color:rgba(76,201,240,0.25);">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent5);"></div>
+        <div class="pillar-icon">🔍</div>
+        <div class="pillar-title" style="color:var(--accent5);">문제 발견 &amp; 개선</div>
+        <div class="pillar-body">
+          운영 중 기존 시스템의 문제점·한계 파악.<br>
+          신규 기능 개발팀 구성 및 <strong style="color:var(--text);">리더 역할</strong> 수행.<br>
+          팀원과 협의하여 효율적인 서비스 기획 도출.<br>
+          사용자 경험 개선 방향으로 프로젝트 추진.
+        </div>
+      </div>
+      <div class="pillar" style="border-color:rgba(255,214,10,0.25);">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent3);"></div>
+        <div class="pillar-icon">🏗️</div>
+        <div class="pillar-title" style="color:var(--accent3);">백오피스 시스템 기획</div>
+        <div class="pillar-body">
+          신규 백오피스 시스템 구축 주도.<br>
+          <strong style="color:var(--text);">개발 스택 선정</strong> 및 기술적 방향 결정.<br>
+          고객과 지속적 협의 → 요구사항 반영 설계.<br>
+          최적 구현 방법 모색 후 프로젝트 리딩.
+        </div>
+      </div>
+      <div class="pillar" style="border-color:rgba(199,125,255,0.25);">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent6);"></div>
+        <div class="pillar-icon">📋</div>
+        <div class="pillar-title" style="color:var(--accent6);">프로젝트 관리</div>
+        <div class="pillar-body">
+          일정 관리 · 개발 스택 협의 · 화면 기획.<br>
+          팀원과 <strong style="color:var(--text);">효율적 커뮤니케이션</strong>.<br>
+          클라이언트 피드백 신속 반영.<br>
+          일정 준수 + 품질 관리 → <strong style="color:var(--text);">성공적 런칭</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="memo purple" style="margin-top:16px;">
+      <strong>리딩 핵심:</strong> 문제 발견 → 팀 구성 → 협의 → 기획 → 일정 관리 → 런칭.
+      기술적 결정(스택 선정)과 대인 역량(고객·팀 커뮤니케이션)을 동시에 수행.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 5 : 마이그레이션 프로세스
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">마이그레이션 프로세스</span>
+      <span class="section-tag tag-orange">Zero Downtime</span>
+    </div>
+
+    <div class="migration-steps">
+
+      <div class="step-item">
+        <div class="step-num">
+          <div class="step-circle" style="border-color:var(--accent5);color:var(--accent5);">1</div>
+        </div>
+        <div class="step-body" style="border-left:3px solid var(--accent5);">
+          <div class="step-title">
+            신규 서비스 VPC 구성 &amp; ALB 설정
+            <span class="badge b">인프라</span>
+          </div>
+          <div class="step-desc">
+            신규 서비스를 위한 <strong>VPC 새로 구성</strong>.
+            외부 엔드포인트 접근을 위한 <strong>ALB 설정</strong>으로 신규 서비스 트래픽 라우팅 준비.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">
+          <div class="step-circle" style="border-color:var(--accent3);color:var(--accent3);">2</div>
+        </div>
+        <div class="step-body" style="border-left:3px solid var(--accent3);">
+          <div class="step-title">
+            기존 서비스에 Spring Cloud Gateway 구성
+            <span class="badge y">라우팅</span>
+          </div>
+          <div class="step-desc">
+            기존 서비스 내부에 <strong>Spring Cloud Gateway</strong> 구성.
+            ALB 라우팅 규칙으로 특정 API 요청을 Gateway로 전달하도록 설정.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">
+          <div class="step-circle" style="border-color:var(--accent2);color:var(--accent2);">3</div>
+        </div>
+        <div class="step-body" style="border-left:3px solid var(--accent2);">
+          <div class="step-title">
+            점진적 마이그레이션
+            <span class="badge p">카나리</span>
+          </div>
+          <div class="step-desc">
+            Gateway에서 <strong>특정 헤더·필드값</strong> 기반으로 트래픽 구분.
+            일부 트래픽만 신규 ALB 엔드포인트로 라우팅 → 단계적으로 비율 증가.
+            기존 시스템 ↔ 신규 시스템 <strong>병렬 운영</strong>으로 리스크 분산.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">
+          <div class="step-circle" style="border-color:var(--accent6);color:var(--accent6);">4</div>
+        </div>
+        <div class="step-body" style="border-left:3px solid var(--accent6);">
+          <div class="step-title">
+            로그 모니터링 &amp; 롤백 대응
+            <span class="badge v">안전망</span>
+          </div>
+          <div class="step-desc">
+            <strong>OpenSearch Service</strong>로 로그 실시간 모니터링.
+            예상치 못한 오류 발생 시 → ALB 라우팅 규칙을 원래 상태로 복구.
+            트래픽을 기존 서비스로 즉시 <strong>롤백</strong> 가능.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">
+          <div class="step-circle" style="border-color:var(--accent1);color:var(--accent1);">5</div>
+        </div>
+        <div class="step-body" style="border-left:3px solid var(--accent1);">
+          <div class="step-title">
+            완전한 마이그레이션 완료
+            <span class="badge g">완료</span>
+          </div>
+          <div class="step-desc">
+            점진적 테스트·롤백 과정을 거쳐 <strong>모든 트래픽 신규 서비스로 전환</strong>.
+            기존 서비스 종료 또는 필요 부분만 유지.
+            Spring Cloud Gateway를 신규 내부 서비스로 이전 → <strong>내부 서비스 라우팅</strong>으로 활용.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="card c-green">
+        <div class="card-title">마이그레이션 핵심 원칙</div>
+        <ul class="dot-list">
+          <li><strong>점진적 전환</strong> — 한 번에 모두 바꾸지 않음</li>
+          <li><strong>헤더/필드 기반</strong> 트래픽 분기로 세밀한 제어</li>
+          <li><strong>롤백 플랜</strong> 항상 준비 — ALB 규칙 복원</li>
+          <li><strong>실시간 모니터링</strong>으로 이상 신호 즉시 감지</li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">Spring Cloud Gateway 역할 변화</div>
+        <ul class="dot-list blue">
+          <li><span class="hl b">마이그레이션 중:</span> 기존 → 신규 트래픽 분기 포인트</li>
+          <li><span class="hl b">마이그레이션 후:</span> 신규 서비스 내부 라우팅</li>
+          <li>동일 컴포넌트가 전환 도구 → 운영 도구로 자연스럽게 역할 이동</li>
+        </ul>
+        <div class="memo blue" style="margin-top:10px;">
+          <strong>포인트:</strong> Gateway를 마이그레이션 완료 후에도 버리지 않고 내부 라우팅에 재활용
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box" style="margin-top:16px;">
+      <div class="result-box-label">마이그레이션 결과</div>
+      <div class="result-box-body">
+        무중단 배포 + 점진적 전환으로 리스크 최소화. 예상치 못한 이슈 발생 시 빠른 롤백으로 서비스 영향 최소화.
+        안정적인 신규 서비스 롤아웃 완료.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  function toggleNav() {
+    document.getElementById('hamburgerBtn').classList.toggle('open');
+    document.getElementById('navOverlay').classList.toggle('open');
+    document.getElementById('sideNav').classList.toggle('open');
+  }
+  // Active 링크 자동 설정
+  (function() {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      if (a.getAttribute('href') === page) a.classList.add('active');
+      else a.classList.remove('active');
+    });
+  })();
+</script>
+</body>
+</html>

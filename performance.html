@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성능 & 장애 대응 치트시트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #ffd60a;
+    --accent4: #7209b7;
+    --accent5: #4cc9f0;
+    --text: #e0e0f0;
+    --muted: #666680;
+    --card: #13131f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent1);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent1) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent2);
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .tag-green  { background: rgba(0,245,212,0.1); color: var(--accent1); border: 1px solid rgba(0,245,212,0.2); }
+  .tag-pink   { background: rgba(247,37,133,0.1); color: var(--accent2); border: 1px solid rgba(247,37,133,0.2); }
+  .tag-yellow { background: rgba(255,214,10,0.1); color: var(--accent3); border: 1px solid rgba(255,214,10,0.2); }
+  .tag-blue   { background: rgba(76,201,240,0.1); color: var(--accent5); border: 1px solid rgba(76,201,240,0.2); }
+  .tag-purple { background: rgba(114,9,183,0.2); color: #b76efb; border: 1px solid rgba(114,9,183,0.3); }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,245,212,0.3);
+    transform: translateY(-2px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .card.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card.c-purple::before { background: linear-gradient(90deg, #b76efb, transparent); }
+
+  .card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card.c-green  .card-title { color: var(--accent1); }
+  .card.c-pink   .card-title { color: var(--accent2); }
+  .card.c-yellow .card-title { color: var(--accent3); }
+  .card.c-blue   .card-title { color: var(--accent5); }
+  .card.c-purple .card-title { color: #b76efb; }
+
+  /* Lists */
+  ul.dot-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  ul.dot-list li {
+    font-size: 13px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  ul.dot-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent1);
+    font-size: 10px;
+    top: 2px;
+  }
+
+  ul.dot-list.pink li::before   { color: var(--accent2); }
+  ul.dot-list.yellow li::before { color: var(--accent3); }
+  ul.dot-list.blue li::before   { color: var(--accent5); }
+  ul.dot-list.purple li::before { color: #b76efb; }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .compare-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  th.h-green  { color: var(--accent1); }
+  th.h-pink   { color: var(--accent2); }
+  th.h-yellow { color: var(--accent3); }
+  th.h-blue   { color: var(--accent5); }
+
+  /* Highlight inline */
+  .hl { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .hl.g { color: var(--accent1); }
+  .hl.p { color: var(--accent2); }
+  .hl.y { color: var(--accent3); }
+  .hl.b { color: var(--accent5); }
+  .hl.v { color: #b76efb; }
+
+  /* Step box */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--accent2);
+    opacity: 0.5;
+    min-width: 24px;
+  }
+
+  .step-body { font-size: 13px; line-height: 1.6; }
+  .step-body strong { color: #fff; font-weight: 700; }
+
+  /* Code block */
+  .code-block {
+    background: #0d0d15;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #a0a0c0;
+    overflow-x: auto;
+  }
+
+  .code-block .kw  { color: var(--accent2); }
+  .code-block .fn  { color: var(--accent1); }
+  .code-block .cm  { color: #444460; font-style: italic; }
+  .code-block .val { color: var(--accent3); }
+  .code-block .cl  { color: var(--accent5); }
+  .code-block .st  { color: var(--accent3); }
+
+  /* Memo */
+  .memo {
+    background: rgba(255,214,10,0.04);
+    border: 1px solid rgba(255,214,10,0.15);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c0c0a0;
+    margin-top: 12px;
+  }
+
+  .memo strong { color: var(--accent3); }
+
+  /* Small label */
+  .slabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* Full-width card */
+  .card-full {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .card-full::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card-full.c-green::before  { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .card-full.c-pink::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card-full.c-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+  .card-full.c-yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+
+  /* Pill row */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(2)  { animation-delay: 0.05s; }
+  .section:nth-child(3)  { animation-delay: 0.10s; }
+  .section:nth-child(4)  { animation-delay: 0.15s; }
+  .section:nth-child(5)  { animation-delay: 0.20s; }
+  .section:nth-child(6)  { animation-delay: 0.25s; }
+  .section:nth-child(7)  { animation-delay: 0.30s; }
+
+  /* Hamburger Navigation */
+  .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
+  .hamburger-btn:hover { border-color: var(--accent1); box-shadow: 0 0 12px rgba(0,245,212,0.3); }
+  .hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--accent1); border-radius: 2px; transition: all 0.3s ease; }
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(2px); }
+  .nav-overlay.open { display: block; }
+  .side-nav { position: fixed; top: 0; right: -280px; width: 260px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 999; padding: 80px 24px 32px; transition: right 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .side-nav.open { right: 0; }
+  .nav-header { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .nav-links { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .nav-links a { display: block; padding: 12px 16px; color: var(--text); text-decoration: none; border-radius: 8px; font-size: 15px; transition: all 0.2s ease; border: 1px solid transparent; }
+  .nav-links a:hover { background: var(--card); border-color: var(--accent1); color: var(--accent1); }
+  .nav-links a.active { background: rgba(0,245,212,0.1); border-color: var(--accent1); color: var(--accent1); }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleNav()" aria-label="메뉴"><span></span><span></span><span></span></button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<nav class="side-nav" id="sideNav">
+  <div class="nav-header">면접 치트시트</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Java 아키텍처</a></li>
+    <li><a href="spring.html">Spring</a></li>
+    <li><a href="gc.html">Java GC</a></li>
+    <li><a href="db.html">데이터베이스</a></li>
+    <li><a href="ds.html">자료구조</a></li>
+    <li><a href="traffic.html">대용량 트래픽</a></li>
+    <li><a href="msa.html">MSA 아키텍처</a></li>
+    <li><a href="performance.html">성능 &amp; 장애대응</a></li>
+    <li><a href="experience.html">AWS 실무 경험</a></li>
+  </ul>
+</nav>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="label">// INTERVIEW PREP — PERFORMANCE</div>
+    <h1>성능 &amp;<br>장애 대응</h1>
+    <div class="subtitle">#APM #프로파일링 #캐싱 #장애대응 #JVM튜닝 #DB최적화</div>
+  </header>
+
+  <!-- 01. APM & 프로파일링 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title">APM &amp; 프로파일링</div>
+      <div class="section-tag tag-green">Observability</div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-green">
+        <div class="card-title">APM 도구</div>
+        <ul class="dot-list">
+          <li><span class="hl g">Pinpoint</span> — 네이버 오픈소스, Java Agent 기반 분산 추적</li>
+          <li><span class="hl g">Datadog APM</span> — SaaS, 인프라·로그·트레이스 통합</li>
+          <li><span class="hl g">New Relic</span> — 트랜잭션 추적, 에러율, 응답시간 분석</li>
+          <li><span class="hl g">Elastic APM</span> — ELK 스택과 연동, 오픈소스</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">스레드 덤프 분석</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">jstack &lt;PID&gt;</span> 또는 kill -3으로 덤프 생성</li>
+          <li>BLOCKED 상태 스레드 → 데드락 또는 락 경합</li>
+          <li>WAITING 상태 과다 → 스레드풀 고갈 의심</li>
+          <li>FastThread, IBM Thread Analyzer로 시각화 분석</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">힙 덤프 분석</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">jmap -dump:format=b,file=heap.hprof &lt;PID&gt;</span></li>
+          <li>-XX:+HeapDumpOnOutOfMemoryError 옵션으로 자동 생성</li>
+          <li>Eclipse MAT으로 Dominator Tree, Leak Suspects 분석</li>
+          <li>Retained Heap이 큰 객체 → 누수 원인 후보</li>
+        </ul>
+      </div>
+    </div>
+    <div class="compare-table" style="margin-top:16px;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-green">상황</th>
+            <th class="h-yellow">진단 도구</th>
+            <th class="h-pink">확인 포인트</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>응답시간 급등</td>
+            <td>APM 트레이스, 스레드 덤프</td>
+            <td>슬로우 쿼리, BLOCKED 스레드, GC STW</td>
+          </tr>
+          <tr>
+            <td>메모리 증가 / OOM</td>
+            <td>힙 덤프, GC 로그</td>
+            <td>Retained Heap 큰 객체, ThreadLocal 누수</td>
+          </tr>
+          <tr>
+            <td>CPU 100%</td>
+            <td>jstack + top -H, async-profiler</td>
+            <td>무한루프, 정규식 백트래킹, GC 과부하</td>
+          </tr>
+          <tr>
+            <td>커넥션 고갈</td>
+            <td>커넥션 풀 모니터링, 스레드 덤프</td>
+            <td>미반환 커넥션, 트랜잭션 장시간 유지</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 02. 트래픽 급증 대응 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title">트래픽 급증 대응</div>
+      <div class="section-tag tag-pink">Resilience</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-yellow">
+        <div class="card-title">Rate Limiting / 스로틀링</div>
+        <ul class="dot-list yellow">
+          <li>클라이언트별 초당 요청 수 제한 (Token Bucket 알고리즘)</li>
+          <li>Spring Cloud Gateway, Bucket4j, Redis 기반 구현</li>
+          <li><span class="hl y">429 Too Many Requests</span> + Retry-After 헤더 응답</li>
+          <li>IP·사용자·API Key 단위로 정책 분리</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">서킷 브레이커 (Resilience4j)</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">CLOSED</span> → 정상 호출 통과</li>
+          <li><span class="hl p">OPEN</span> → 실패율 임계치 초과 시, 즉시 fallback 반환</li>
+          <li><span class="hl p">HALF_OPEN</span> → 일부 호출 허용, 복구 여부 판단</li>
+          <li>Bulkhead로 스레드/동시성 제한, TimeLimiter로 타임아웃 제어</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-full c-green" style="margin-top:16px;">
+      <div class="slabel">트래픽 급증 체크리스트</div>
+      <div class="grid-2" style="margin-top:12px;">
+        <ul class="dot-list">
+          <li>수평 확장(Scale Out) — 오토스케일링 정책 사전 설정</li>
+          <li>DB 커넥션 풀 크기 검토 (HikariCP maxPoolSize)</li>
+          <li>비동기 처리 전환 — 큐(Kafka, SQS)로 부하 분산</li>
+        </ul>
+        <ul class="dot-list">
+          <li>CDN으로 정적 자원 오프로드</li>
+          <li>읽기 집중 API에 캐시 레이어 추가</li>
+          <li>불필요한 동기 외부 호출 타임아웃 단축</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03. 캐시 전략 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title">캐시 전략</div>
+      <div class="section-tag tag-yellow">Cache</div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-green">
+        <div class="card-title">Cache Aside (Lazy)</div>
+        <ul class="dot-list">
+          <li>읽기 시 캐시 미스 → DB 조회 → 캐시 저장</li>
+          <li>가장 일반적인 패턴, 구현 간단</li>
+          <li>캐시 미스 직후 <span class="hl g">Cache Stampede</span> 주의</li>
+          <li>해결: 뮤텍스 락 또는 확률적 조기 갱신(PER)</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">Write Through</div>
+        <ul class="dot-list yellow">
+          <li>쓰기 시 DB와 캐시 <span class="hl y">동시에 업데이트</span></li>
+          <li>캐시와 DB 항상 동기화 → 읽기 일관성 높음</li>
+          <li>쓰기 지연 증가, 사용되지 않는 데이터도 캐시됨</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">Write Behind (Async)</div>
+        <ul class="dot-list pink">
+          <li>쓰기 시 캐시만 업데이트 후 <span class="hl p">비동기로 DB 반영</span></li>
+          <li>쓰기 성능 최고, 배치 병합으로 DB 부하 감소</li>
+          <li>캐시 장애 시 데이터 유실 위험 (내구성 낮음)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="compare-table" style="margin-top:16px;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-green">이슈</th>
+            <th class="h-yellow">원인</th>
+            <th class="h-pink">해결책</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cache Stampede</td>
+            <td>동시에 캐시 만료 → 다수 요청이 DB 동시 접근</td>
+            <td>뮤텍스 락, PER(Probabilistic Early Recomputation), 캐시 TTL 지터</td>
+          </tr>
+          <tr>
+            <td>Cache Penetration</td>
+            <td>존재하지 않는 키 반복 요청 → DB 직접 타격</td>
+            <td>Null 값도 캐시 저장, Bloom Filter로 사전 필터링</td>
+          </tr>
+          <tr>
+            <td>Cache Avalanche</td>
+            <td>대량 캐시 동시 만료 → DB 폭주</td>
+            <td>TTL에 랜덤 지터(jitter) 추가, 핫 데이터는 무기한 캐시</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 04. 장애 포스트모텀 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title">장애 포스트모텀</div>
+      <div class="section-tag tag-blue">Incident</div>
+    </div>
+    <div class="card-full c-blue" style="margin-bottom:16px;">
+      <div class="slabel">포스트모텀 원칙</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.6;">포스트모텀은 <span class="hl b">비난 없는(Blameless)</span> 문화가 핵심입니다. 개인이 아닌 시스템과 프로세스의 취약점을 찾아 재발을 방지합니다.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>타임라인 작성</strong> — 장애 감지 시각, 각 대응 행동, 복구 완료까지 시간 순으로 정확히 기록. 로그·알람·Slack 메시지를 증거로 활용</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>근본 원인 분석 (5 Whys)</strong> — "왜?"를 반복해 표면적 증상이 아닌 근본 원인 도달. 단일 원인보다 복합 요인인 경우가 많음</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>영향도 정리</strong> — 영향받은 사용자 수, 서비스 다운 시간(MTTR), 비즈니스 손실 추정</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>재발 방지 액션</strong> — 단기(즉각 핫픽스)와 장기(아키텍처 개선) 액션을 구분, 담당자와 기한 명시</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body"><strong>공유 및 학습</strong> — 팀 전체에 공개, 런북(Runbook) 업데이트, 알람 임계치 재설정</div>
+      </div>
+    </div>
+    <div class="memo">
+      <strong>MTTR vs MTTD</strong> — MTTD(Mean Time To Detect)는 장애 감지까지 걸린 시간, MTTR(Mean Time To Recover)은 복구까지 걸린 시간. 알람 민감도를 높여 MTTD를 줄이는 것이 선행 과제입니다.
+    </div>
+  </div>
+
+  <!-- 05. JVM 성능 튜닝 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title">JVM 성능 튜닝</div>
+      <div class="section-tag tag-purple">JVM</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">힙 크기 설정</div>
+        <ul class="dot-list">
+          <li><span class="hl g">-Xms</span>(초기) = <span class="hl g">-Xmx</span>(최대) 로 설정 → GC 재조정 오버헤드 제거</li>
+          <li>일반적으로 사용 가능 물리 메모리의 50~75% 할당</li>
+          <li>컨테이너 환경: <span class="hl g">-XX:MaxRAMPercentage=75</span> 로 동적 설정</li>
+          <li>Old Gen 크기: Full GC 후 Live Set의 2~3배 확보</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">GC 알고리즘 선택</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">G1GC</span> (Java 9+ 기본) — 힙 4GB 이상, 응답시간 중시</li>
+          <li><span class="hl y">ZGC</span> — STW 1ms 이하, 대용량 힙(수백GB) 특화</li>
+          <li><span class="hl y">Shenandoah</span> — ZGC와 유사, Red Hat 주도</li>
+          <li><span class="hl y">ParallelGC</span> — 배치 처리, 처리량(Throughput) 중시</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm"># GC 로그 활성화 (Java 9+)</span>
+-Xlog:gc*:file=/logs/gc.log:time,uptime,level,tags:filecount=5,filesize=20m
+
+<span class="cm"># G1GC 주요 옵션</span>
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=200          <span class="cm"># 목표 STW 시간 (기본 200ms)</span>
+-XX:G1HeapRegionSize=16m          <span class="cm"># 힙이 클수록 큰 리전 크기 권장</span>
+-XX:InitiatingHeapOccupancyPercent=45
+
+<span class="cm"># OOM 발생 시 자동 힙 덤프</span>
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/logs/heap.hprof
+    </div>
+    <div class="memo">
+      GC 튜닝의 첫 번째 원칙: <strong>GC 로그를 먼저 분석</strong>하고, Full GC 빈도·STW 시간·Promotion Failure 여부를 확인한 후 파라미터를 조정합니다. 추측으로 튜닝하지 않습니다.
+    </div>
+  </div>
+
+  <!-- 06. DB 쿼리 최적화 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title">DB 쿼리 최적화</div>
+      <div class="section-tag tag-green">Database</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">EXPLAIN 분석 포인트</div>
+        <ul class="dot-list">
+          <li><span class="hl g">type: ALL</span> → Full Table Scan, 인덱스 추가 필요</li>
+          <li><span class="hl g">type: ref / range</span> → 인덱스 사용 (양호)</li>
+          <li><span class="hl g">Extra: Using filesort</span> → ORDER BY 인덱스 최적화 필요</li>
+          <li><span class="hl g">Extra: Using temporary</span> → GROUP BY 임시 테이블 생성 (주의)</li>
+          <li><span class="hl g">rows</span> 값 큰 경우 → 인덱스 선택성 검토</li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">커넥션 풀 튜닝 (HikariCP)</div>
+        <ul class="dot-list blue">
+          <li>공식 권장: <span class="hl b">maxPoolSize = (코어수 × 2) + 유효 스핀들 수</span></li>
+          <li>CPU 4코어 서버: maxPoolSize ≈ 10 (과도한 설정 역효과)</li>
+          <li><span class="hl b">connectionTimeout</span>: 30초 (기본), 급증 대응 시 단축 검토</li>
+          <li><span class="hl b">leakDetectionThreshold</span>: 미반환 커넥션 감지 (개발 시 2000ms)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm">-- Slow Query Log 활성화 (MySQL)</span>
+SET GLOBAL slow_query_log = ON;
+SET GLOBAL long_query_time = 1;       <span class="cm">-- 1초 이상 쿼리 기록</span>
+SET GLOBAL log_queries_not_using_indexes = ON;
+
+<span class="cm">-- EXPLAIN ANALYZE (MySQL 8.0+ / PostgreSQL)</span>
+EXPLAIN ANALYZE SELECT * FROM orders
+WHERE user_id = 123 AND status = 'PAID'
+ORDER BY created_at DESC LIMIT 20;
+    </div>
+    <div class="pill-row">
+      <span class="pill">EXPLAIN ANALYZE</span>
+      <span class="pill">Slow Query Log</span>
+      <span class="pill">커버링 인덱스</span>
+      <span class="pill">HikariCP</span>
+      <span class="pill">서킷 브레이커</span>
+      <span class="pill">Cache Stampede</span>
+      <span class="pill">5 Whys</span>
+      <span class="pill">Blameless Postmortem</span>
+      <span class="pill">G1GC / ZGC</span>
+      <span class="pill">async-profiler</span>
+    </div>
+  </div>
+
+</div>
+<script>
+  function toggleNav() {
+    document.getElementById('hamburgerBtn').classList.toggle('open');
+    document.getElementById('sideNav').classList.toggle('open');
+    document.getElementById('navOverlay').classList.toggle('open');
+  }
+  (function() {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      if (a.getAttribute('href') === page) a.classList.add('active');
+    });
+  })();
+</script>
+</body>
+</html>
