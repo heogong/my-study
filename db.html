@@ -428,6 +428,8 @@
     <li><a href="ds.html">자료구조</a></li>
     <li><a href="traffic.html">대용량 트래픽</a></li>
     <li><a href="msa.html">MSA 아키텍처</a></li>
+    <li><a href="performance.html">성능 &amp; 장애대응</a></li>
+    <li><a href="experience.html">AWS 실무 경험</a></li>
   </ul>
 </nav>
 <div class="container">
@@ -1050,6 +1052,214 @@
       <span class="pill">두 단계 커밋(2PC)</span>
       <span class="pill">Saga Pattern</span>
       <span class="pill">CDC(Change Data Capture)</span>
+    </div>
+  </div>
+
+  <!-- 12. N+1 문제 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <div class="section-title">N+1 문제</div>
+      <div class="section-tag tag-pink">JPA</div>
+    </div>
+    <div class="card-full c-pink" style="margin-bottom:16px;">
+      <div class="slabel">원인</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.6;">LAZY 로딩된 연관 엔티티에 접근할 때 <span class="hl p">N개의 추가 쿼리</span>가 발생. 1건 조회 후 각 연관 객체마다 개별 SELECT가 실행됨.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card c-pink">
+        <div class="card-title">fetch join</div>
+        <ul class="dot-list pink">
+          <li>JPQL에서 <span class="hl p">JOIN FETCH</span>로 한 번에 로딩</li>
+          <li>페이징과 함께 사용 시 메모리 페이징 경고 주의</li>
+          <li>컬렉션 fetch join은 중복 결과 → <span class="hl p">DISTINCT</span> 필요</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">@EntityGraph</div>
+        <ul class="dot-list">
+          <li>메서드에 <span class="hl g">@EntityGraph(attributePaths = "...")</span> 지정</li>
+          <li>JPQL 없이 선언적으로 EAGER 로딩 제어</li>
+          <li>Spring Data JPA Repository 메서드에 적용</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">default_batch_fetch_size</div>
+        <ul class="dot-list yellow">
+          <li><span class="hl y">IN 절</span>로 지정 개수만큼 묶어서 조회</li>
+          <li>hibernate.default_batch_fetch_size=100 설정</li>
+          <li>컬렉션 페이징 시 가장 안전한 해결책</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm">// fetch join — 단건 쿼리로 연관 데이터까지 로딩</span>
+<span class="st">@Query("SELECT o FROM Order o JOIN FETCH o.member WHERE o.id = :id")</span>
+<span class="cl">Order</span> findWithMember(<span class="st">@Param("id")</span> <span class="cl">Long</span> id);
+
+<span class="cm">// EntityGraph — 선언적 EAGER 로딩</span>
+<span class="st">@EntityGraph(attributePaths = {"member", "orderItems"})</span>
+<span class="cl">Optional</span>&lt;<span class="cl">Order</span>&gt; findById(<span class="cl">Long</span> id);
+    </div>
+  </div>
+
+  <!-- 13. OSIV -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <div class="section-title">OSIV (Open Session In View)</div>
+      <div class="section-tag tag-yellow">JPA</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">OSIV = true (기본값)</div>
+        <ul class="dot-list">
+          <li>영속성 컨텍스트가 <span class="hl g">HTTP 요청 전체</span> 동안 유지</li>
+          <li>Controller, View에서 LAZY 로딩 가능</li>
+          <li><span class="hl g">편리</span>하지만 DB 커넥션을 오래 점유</li>
+          <li>트래픽 많을 때 커넥션 풀 고갈 위험</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">OSIV = false (권장)</div>
+        <ul class="dot-list pink">
+          <li>트랜잭션 종료 시 영속성 컨텍스트 닫힘</li>
+          <li>Service 계층에서 모든 데이터 로딩 완료 필요</li>
+          <li><span class="hl p">커넥션 반환이 빠름</span> → 고트래픽에 유리</li>
+          <li>Controller에서 LAZY 로딩 시 LazyInitializationException</li>
+        </ul>
+      </div>
+    </div>
+    <div class="memo" style="margin-top:16px;">
+      실무에서는 <span class="hl">spring.jpa.open-in-view=false</span> 설정 후, 조회 전용 서비스를 별도로 두거나 DTO 프로젝션으로 필요한 데이터만 로딩하는 패턴을 권장합니다.
+    </div>
+  </div>
+
+  <!-- 14. 인덱스 설계 심화 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">14</div>
+      <div class="section-title">인덱스 설계 심화</div>
+      <div class="section-tag tag-blue">Index</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">복합 인덱스 컬럼 순서</div>
+        <ul class="dot-list">
+          <li><span class="hl g">선택성(Selectivity) 높은 컬럼</span>을 앞에 배치</li>
+          <li>WHERE 조건에서 = 비교 컬럼을 범위 컬럼보다 앞에</li>
+          <li>INDEX(a, b) 는 a 단독 조건도 활용 가능, b 단독은 불가</li>
+          <li>ORDER BY, GROUP BY 컬럼도 인덱스에 포함하면 filesort 제거</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">커버링 인덱스</div>
+        <ul class="dot-list yellow">
+          <li>SELECT 컬럼이 <span class="hl y">인덱스 안에 모두 포함</span>되면 테이블 미접근</li>
+          <li>EXPLAIN에서 <span class="hl y">Using index</span> 표시 → 가장 빠른 읽기</li>
+          <li>쓰기 성능 저하와 인덱스 크기 증가가 트레이드오프</li>
+          <li>페이징 최적화: 커버링 인덱스로 PK만 추출 후 JOIN</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm">-- 커버링 인덱스를 활용한 페이징 최적화</span>
+<span class="cm">-- 느린 방법: 전체 행 접근 후 offset 처리</span>
+SELECT * FROM orders ORDER BY created_at DESC LIMIT 10 OFFSET 100000;
+
+<span class="cm">-- 빠른 방법: 커버링 인덱스로 PK만 추출 후 JOIN</span>
+SELECT o.* FROM orders o
+JOIN (SELECT id FROM orders ORDER BY created_at DESC LIMIT 10 OFFSET 100000) t
+ON o.id = t.id;
+    </div>
+  </div>
+
+  <!-- 15. 낙관적/비관적 락 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">15</div>
+      <div class="section-title">낙관적 락 vs 비관적 락</div>
+      <div class="section-tag tag-purple">Lock</div>
+    </div>
+    <div class="grid-2">
+      <div class="card c-green">
+        <div class="card-title">낙관적 락 (Optimistic Lock)</div>
+        <ul class="dot-list">
+          <li><span class="hl g">@Version</span> 필드로 버전 충돌 감지</li>
+          <li>DB 락 없이 커밋 시점에 버전 비교</li>
+          <li>충돌 시 <span class="hl g">OptimisticLockException</span> 발생 → 재시도</li>
+          <li>읽기 많고 충돌 드문 경우에 적합 (성능 ↑)</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">비관적 락 (Pessimistic Lock)</div>
+        <ul class="dot-list pink">
+          <li><span class="hl p">PESSIMISTIC_WRITE</span>로 SELECT FOR UPDATE 실행</li>
+          <li>조회 시점부터 다른 트랜잭션 차단 (DB 락 점유)</li>
+          <li>충돌 빈번하거나 데이터 일관성이 매우 중요한 경우</li>
+          <li>데드락 위험, 성능 저하 — 락 유지 시간 최소화 필수</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm">// 낙관적 락 — @Version 필드 추가만으로 동작</span>
+<span class="st">@Entity</span>
+<span class="kw">class</span> <span class="cl">Product</span> {
+  <span class="st">@Version</span> <span class="kw">private</span> <span class="cl">Long</span> version; <span class="cm">// JPA가 자동으로 UPDATE 시 버전 체크</span>
+}
+
+<span class="cm">// 비관적 락 — 조회 시 DB 레코드 잠금</span>
+<span class="st">@Lock(LockModeType.PESSIMISTIC_WRITE)</span>
+<span class="st">@Query("SELECT p FROM Product p WHERE p.id = :id")</span>
+<span class="cl">Product</span> findByIdForUpdate(<span class="cl">Long</span> id);
+    </div>
+  </div>
+
+  <!-- 16. 대용량 데이터 처리 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">16</div>
+      <div class="section-title">대용량 데이터 처리</div>
+      <div class="section-tag tag-green">Batch</div>
+    </div>
+    <div class="grid-3">
+      <div class="card c-green">
+        <div class="card-title">Chunk 기반 배치</div>
+        <ul class="dot-list">
+          <li>Spring Batch의 <span class="hl g">ItemReader → ItemProcessor → ItemWriter</span></li>
+          <li>지정 chunk-size 만큼 읽고 처리 후 커밋</li>
+          <li>실패 시 해당 chunk만 롤백 (재시작 지점 유지)</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">Stream / Cursor 조회</div>
+        <ul class="dot-list yellow">
+          <li>JPA <span class="hl y">Stream&lt;T&gt;</span> 반환으로 전체 결과 메모리 적재 방지</li>
+          <li>MyBatis <span class="hl y">ResultHandler</span> 또는 JDBC Cursor 활용</li>
+          <li>반드시 트랜잭션 내에서 사용하고 Stream.close() 호출</li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">Bulk Insert / Update</div>
+        <ul class="dot-list pink">
+          <li>JPA <span class="hl p">saveAll()</span>은 IDENTITY 전략 시 개별 INSERT</li>
+          <li>SEQUENCE 전략 + <span class="hl p">batch_size</span> 설정으로 배치 INSERT</li>
+          <li>대용량은 <span class="hl p">JDBC batchUpdate</span> 또는 LOAD DATA INFILE 권장</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:16px;">
+<span class="cm">// JPA Stream 조회 — 커서 기반으로 메모리 효율적 처리</span>
+<span class="st">@Transactional(readOnly = true)</span>
+<span class="kw">public</span> <span class="kw">void</span> processAll() {
+  <span class="kw">try</span> (<span class="cl">Stream</span>&lt;<span class="cl">Order</span>&gt; stream = orderRepository.streamAll()) {
+    stream.forEach(<span class="kw">this</span>::process);
+  }
+}
+
+<span class="cm">// JDBC batchUpdate — 대용량 INSERT 최적화</span>
+jdbcTemplate.batchUpdate(<span class="st">"INSERT INTO orders VALUES (?,?,?)"</span>, items, <span class="st">1000</span>,
+  (ps, item) -&gt; { ps.setLong(<span class="st">1</span>, item.getId()); <span class="cm">/* ... */</span> });
     </div>
   </div>
 

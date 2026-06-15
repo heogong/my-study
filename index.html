@@ -714,6 +714,8 @@
     <li><a href="ds.html">자료구조</a></li>
     <li><a href="traffic.html">대용량 트래픽</a></li>
     <li><a href="msa.html">MSA 아키텍처</a></li>
+    <li><a href="performance.html">성능 &amp; 장애대응</a></li>
+    <li><a href="experience.html">AWS 실무 경험</a></li>
   </ul>
 </nav>
 <div class="container">
@@ -1274,6 +1276,104 @@ count.incrementAndGet(); <span class="cm">// Thread-safe</span>
 <span class="cm">// ReentrantLock — synchronized보다 세밀한 락 제어</span>
         </div>
         <span class="hl">volatile</span>은 가시성만 보장(원자성 X), <span class="hl">synchronized</span>는 원자성+가시성 모두 보장하지만 성능 비용이 있습니다. 고성능이 필요하면 <span class="hl">java.util.concurrent</span> 패키지를 우선 검토합니다.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVA 언어 심화 -->
+  <div class="section-title">Java 언어 심화</div>
+  <div class="qa-list">
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.07</span>
+        volatile, synchronized, ReentrantLock 의 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"volatile은 가시성, synchronized는 원자성+가시성, ReentrantLock은 명시적 락 제어입니다."</span>
+        <div class="code-block">
+<span class="cm">// volatile — 가시성 보장, 원자성 보장 X</span>
+<span class="kw">private volatile boolean</span> running = <span class="kw">true</span>; <span class="cm">// 다른 스레드에 즉시 반영</span>
+
+<span class="cm">// synchronized — 원자성 + 가시성, 블록 단위 상호배제</span>
+<span class="kw">public synchronized void</span> increment() { count++; }
+
+<span class="cm">// ReentrantLock — tryLock, 타임아웃, Condition 지원</span>
+<span class="cl">ReentrantLock</span> lock = <span class="kw">new</span> <span class="cl">ReentrantLock</span>();
+<span class="kw">if</span> (lock.tryLock(<span class="st">1</span>, <span class="cl">TimeUnit</span>.SECONDS)) {
+  <span class="kw">try</span> { <span class="cm">/* 임계구역 */</span> } <span class="kw">finally</span> { lock.unlock(); }
+}
+        </div>
+        <span class="hl">synchronized</span>는 JVM이 자동으로 락을 해제하지만 <span class="hl">ReentrantLock</span>은 반드시 finally에서 unlock() 호출이 필요합니다. 고성능 동시성이 필요하면 <span class="hl">AtomicInteger</span>(CAS 기반)를 우선 검토합니다.
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.08</span>
+        ThreadLocal 사용 케이스와 메모리 누수 위험은?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"스레드별 독립 저장소로 MDC 로깅, 인증 컨텍스트, 트랜잭션 연결에 활용합니다."</span>
+        <div class="code-block">
+<span class="kw">private static final</span> <span class="cl">ThreadLocal</span>&lt;<span class="cl">User</span>&gt; currentUser = <span class="kw">new</span> <span class="cl">ThreadLocal</span>&lt;&gt;();
+
+currentUser.set(user);       <span class="cm">// 저장</span>
+<span class="cl">User</span> u = currentUser.get();  <span class="cm">// 조회</span>
+currentUser.remove();        <span class="cm">// 반드시 제거! 스레드풀 재사용 시 누수 방지</span>
+        </div>
+        <span class="hl">스레드풀 환경에서 remove() 누락 시</span> 이전 요청 데이터가 다음 요청에 노출됩니다. Spring의 SecurityContextHolder, RequestContextHolder 모두 ThreadLocal 기반입니다.
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.09</span>
+        CompletableFuture와 Future의 차이는?
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"Future는 블로킹 get()만 지원하지만 CompletableFuture는 논블로킹 콜백 체이닝을 지원합니다."</span>
+        <div class="code-block">
+<span class="cm">// Future — get()에서 블로킹 발생</span>
+<span class="cl">Future</span>&lt;<span class="cl">String</span>&gt; f = executor.submit(() -&gt; fetch());
+<span class="cl">String</span> result = f.get(); <span class="cm">// 스레드 블로킹!</span>
+
+<span class="cm">// CompletableFuture — 논블로킹 체이닝</span>
+<span class="cl">CompletableFuture</span>.supplyAsync(() -&gt; fetchUser(id))
+  .thenApply(user -&gt; enrich(user))
+  .thenAccept(result -&gt; save(result))
+  .exceptionally(ex -&gt; { log(ex); <span class="kw">return null</span>; });
+        </div>
+        <span class="hl">thenCompose()</span>로 비동기 작업 순차 연결, <span class="hl">thenCombine()</span>으로 두 결과를 병합합니다. Java 21 Virtual Thread와 함께 사용하면 I/O 집약 서비스에서 특히 효과적입니다.
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggle(this)">
+      <div class="qa-q">
+        <span class="qa-badge">Q.10</span>
+        Java 8 ~ 21 주요 변경사항을 설명하세요
+        <span class="qa-chevron">▼</span>
+      </div>
+      <div class="qa-a">
+        <span class="hl">"람다/스트림(8) → 모듈(9) → 텍스트블록(13) → 레코드/봉인클래스(16/17) → 가상스레드(21)"</span>
+        <div class="code-block">
+<span class="cm">// Java 8 — 람다, Stream API, Optional, Default Method</span>
+list.stream().filter(x -&gt; x &gt; 0).map(<span class="cl">String</span>::valueOf).collect(<span class="cl">Collectors</span>.toList());
+
+<span class="cm">// Java 16 — Record (불변 데이터 클래스 간소화)</span>
+<span class="kw">record</span> <span class="cl">Point</span>(<span class="kw">int</span> x, <span class="kw">int</span> y) {} <span class="cm">// getter, equals, hashCode, toString 자동 생성</span>
+
+<span class="cm">// Java 17 — Sealed Class (상속 허용 클래스 제한)</span>
+<span class="kw">sealed interface</span> <span class="cl">Shape</span> <span class="kw">permits</span> <span class="cl">Circle</span>, <span class="cl">Rectangle</span> {}
+
+<span class="cm">// Java 21 — Virtual Thread (경량 스레드, 블로킹 I/O 혁신)</span>
+<span class="cl">Thread</span>.ofVirtual().start(() -&gt; handleRequest());
+        </div>
+        LTS 버전은 8, 11, 17, 21입니다. <span class="hl">Virtual Thread</span>는 수백만 개의 경량 스레드를 생성할 수 있어 I/O 집약 서비스에서 스레드풀 튜닝 부담을 크게 줄여줍니다.
       </div>
     </div>
 
