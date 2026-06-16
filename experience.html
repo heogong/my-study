@@ -631,6 +631,9 @@
   .section:nth-child(3) { animation-delay: 0.19s; }
   .section:nth-child(4) { animation-delay: 0.26s; }
   .section:nth-child(5) { animation-delay: 0.33s; }
+  .section:nth-child(6) { animation-delay: 0.40s; }
+  .section:nth-child(7) { animation-delay: 0.47s; }
+  .section:nth-child(8) { animation-delay: 0.54s; }
 
   /* ── HAMBURGER NAV ── */
   .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
@@ -691,7 +694,7 @@
   <header>
     <div class="label">실무 경험 · AWS</div>
     <h1>AWS 실무 경험</h1>
-    <div class="subtitle">배포 파이프라인 · 아키텍처 · 트러블슈팅 · 리딩 · 마이그레이션</div>
+    <div class="subtitle">배포 파이프라인 · 아키텍처 · 트러블슈팅 · 리딩 · 마이그레이션 · 전환전략 · 운영</div>
   </header>
 
   <!-- ══════════════════════════════════════════
@@ -1140,6 +1143,243 @@
       <div class="result-box-body">
         무중단 배포 + 점진적 전환으로 리스크 최소화. 예상치 못한 이슈 발생 시 빠른 롤백으로 서비스 영향 최소화.
         안정적인 신규 서비스 롤아웃 완료.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 6 : 클라우드 전환 전략 (6R)
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">클라우드 전환 전략 (6R)</span>
+      <span class="section-tag tag-orange">Migration Strategy</span>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="card c-orange">
+        <div class="card-title">Rehost</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Lift &amp; Shift</div>
+        <ul class="dot-list orange">
+          <li>그대로 AWS로 올림</li>
+          <li>빠른 이전, 코드 수정 불가 시</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">Replatform</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Lift &amp; Reshape</div>
+        <ul class="dot-list yellow">
+          <li>약간 최적화 후 이전</li>
+          <li>DB → RDS, WAS → Beanstalk</li>
+          <li><strong>EC2 → ECS 전환 시 적용</strong></li>
+        </ul>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">Refactor</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Re-architect</div>
+        <ul class="dot-list blue">
+          <li>클라우드 네이티브로 재설계</li>
+          <li>MSA 전환, 성능/확장성 개선</li>
+          <li><strong>Python → Java + MSA 전환 시 적용</strong></li>
+        </ul>
+      </div>
+      <div class="card c-pink">
+        <div class="card-title">Repurchase</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Drop &amp; Shop</div>
+        <ul class="dot-list pink">
+          <li>SaaS로 교체</li>
+          <li>CRM → Salesforce</li>
+        </ul>
+      </div>
+      <div class="card c-purple">
+        <div class="card-title">Retire</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">폐기</div>
+        <ul class="dot-list purple">
+          <li>안 쓰는 시스템 정리</li>
+          <li>불필요 리소스 제거</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">Retain</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Revisit</div>
+        <ul class="dot-list">
+          <li>일단 안 움직임</li>
+          <li>규제/의존성 문제</li>
+          <li>나중에 재검토</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="memo" style="margin-bottom:16px;">
+      <strong>실무 적용:</strong> EC2 → ECS 마이그레이션 시 <strong>Replatform + Refactor 병행</strong> —
+      핵심 서비스는 Python → Java 언어 전환(Refactor), 보조 서비스는 EC2 → ECS(Replatform)
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-blue">
+        <div class="card-title">마이그레이션 Assessment</div>
+        <ul class="dot-list blue">
+          <li>공개 IP 구성 → <span class="hl p">보안 취약점</span> 식별</li>
+          <li>오토스케일링 미구성 → <span class="hl y">고정 비용 문제</span> 파악</li>
+          <li>배포 복잡도 → <span class="hl b">빈번한 배포 어려움</span> 확인</li>
+          <li>인프라팀 인터뷰 + 코드 분석 + 트래픽 패턴 병행</li>
+        </ul>
+        <div class="memo blue" style="margin-top:10px;">
+          <strong>핵심:</strong> Assessment = 현황 파악 + 문제점 정의 → 전환 전략 결정의 인풋
+        </div>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">무중단 전환 핵심</div>
+        <ul class="dot-list">
+          <li>VPC 피어링 불가 (CIDR 충돌) → <strong>SCG 우회</strong></li>
+          <li>기존 환경에 Spring Cloud Gateway 먼저 설치</li>
+          <li>ALB 리스너 규칙으로 경로별 트래픽 제어</li>
+          <li>검증 완료 후 도메인 전환으로 최종 스위칭</li>
+        </ul>
+        <div class="memo green" style="margin-top:10px;">
+          <strong>결과:</strong> SCG 점진적 전환 → 도메인 스위칭으로 무중단 마이그레이션 완료
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 7 : 아키텍처 심화 설계
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">아키텍처 심화 설계</span>
+      <span class="section-tag tag-purple">ZTA · MSA · Gateway</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="card c-blue">
+        <div class="card-title">ZTA — Zero Trust Architecture</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">"Never Trust, Always Verify"</div>
+        <ul class="dot-list blue">
+          <li>서비스 간 <strong>mTLS 인증</strong> 적용</li>
+          <li><strong>IAM 최소권한</strong> 원칙 — 서비스별 권한 분리</li>
+          <li><strong>AWS WAF</strong> 화이트리스트 — 허가된 IP만 허용</li>
+          <li>VPC + 서브넷 + 보안그룹 <strong>네트워크 세그멘테이션</strong></li>
+        </ul>
+        <div class="memo blue" style="margin-top:10px;">
+          <strong>핵심:</strong> 내부망도 신뢰 불가 — 모든 요청을 검증하는 보안 설계 철학
+        </div>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">MSA 서비스 간 통신 설계</div>
+        <ul class="dot-list">
+          <li><span class="hl b">동기</span> → REST API (일반 서비스 통신)</li>
+          <li><span class="hl g">비동기</span> → AWS SQS (주소검색 등 지연 허용)</li>
+          <li>요청/검증 분리 → API마다 스레드 과생성 방지</li>
+          <li>SQS 도입 → 데이터 유실 방지 + 안정성 확보</li>
+        </ul>
+        <div class="memo green" style="margin-top:10px;">
+          <strong>원칙:</strong> 동기는 REST, 비동기는 SQS — 처리 특성에 맞게 통신 방식 분리
+        </div>
+      </div>
+      <div class="card c-purple">
+        <div class="card-title">Spring Cloud Gateway 실무</div>
+        <ul class="dot-list purple">
+          <li><span class="hl v">신세계아이앤씨:</span> 온프레미스 → 클라우드 Canary 전환</li>
+          <li><span class="hl v">CODE:</span> EC2 → ECS 무중단 라우팅 제어</li>
+          <li>ALB 뒤에 SCG — 경로 기반 라우팅 설계</li>
+          <li>가중치 기반 트래픽 분산으로 점진적 전환</li>
+        </ul>
+        <div class="memo purple" style="margin-top:10px;">
+          <strong>포인트:</strong> SCG 두 번 실무 적용 — Canary 배포 + 마이그레이션 무중단 트래픽 제어
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 8 : AWS 서비스 스택 & 운영
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">AWS 서비스 스택 &amp; 운영</span>
+      <span class="section-tag tag-yellow">Ops</span>
+    </div>
+
+    <div class="card c-yellow" style="margin-bottom:16px;">
+      <div class="card-title">실무 사용 AWS 서비스 스택</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+        <span class="badge b">ECS Fargate</span>
+        <span class="badge b">ALB</span>
+        <span class="badge p">Aurora MySQL</span>
+        <span class="badge g">ElastiCache Redis</span>
+        <span class="badge g">SQS</span>
+        <span class="badge y">Lambda</span>
+        <span class="badge y">EventBridge</span>
+        <span class="badge p">OpenSearch</span>
+        <span class="badge g">CloudWatch</span>
+        <span class="badge v">WAF</span>
+        <span class="badge b">CodePipeline</span>
+        <span class="badge b">CodeBuild</span>
+        <span class="badge b">CodeDeploy</span>
+        <span class="badge v">NAT Gateway</span>
+      </div>
+      <div class="memo" style="margin-top:12px;">
+        <strong>추가 경험:</strong> 이수시스템 — NCP 기반 <strong>Kubernetes</strong> 환경 구축 · HashiCorp <strong>Vault</strong> 민감정보 중앙 관리
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card c-pink">
+        <div class="card-title">IAM 권한 설계</div>
+        <ul class="dot-list pink">
+          <li>서비스별 <strong>IAM Role 분리</strong> — 최소권한 원칙</li>
+          <li><strong>ECS Task Role</strong>로 컨테이너 단위 권한 부여</li>
+          <li>인스턴스 프로파일 미사용 → 권한 범위 최소화</li>
+          <li>민감 정보 → <strong>HashiCorp Vault</strong> 중앙화 관리</li>
+        </ul>
+        <div class="memo pink" style="margin-top:10px;">
+          <strong>핵심:</strong> 서비스별 IAM Role 분리 + ECS Task Role 단위 최소권한 부여
+        </div>
+      </div>
+      <div class="card c-blue">
+        <div class="card-title">ECS vs EKS 선택 기준</div>
+        <table class="when-table" style="margin-top:0;">
+          <thead>
+            <tr><th>항목</th><th>ECS (Fargate)</th><th>EKS</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--text);width:auto;text-align:left;padding-left:14px;">진입장벽</td>
+              <td style="color:var(--accent1);">낮음</td>
+              <td style="color:var(--accent2);">높음</td>
+            </tr>
+            <tr>
+              <td style="color:var(--text);width:auto;text-align:left;padding-left:14px;">AWS 친화성</td>
+              <td style="color:var(--accent1);">높음</td>
+              <td style="color:var(--muted);">보통</td>
+            </tr>
+            <tr>
+              <td style="color:var(--text);width:auto;text-align:left;padding-left:14px;">커스터마이징</td>
+              <td style="color:var(--accent2);">제한적</td>
+              <td style="color:var(--accent1);">자유로움</td>
+            </tr>
+            <tr>
+              <td style="color:var(--text);width:auto;text-align:left;padding-left:14px;">멀티클라우드</td>
+              <td style="color:var(--accent2);">어려움</td>
+              <td style="color:var(--accent1);">가능</td>
+            </tr>
+            <tr>
+              <td style="color:var(--text);width:auto;text-align:left;padding-left:14px;">운영 복잡도</td>
+              <td style="color:var(--accent1);">낮음</td>
+              <td style="color:var(--accent2);">높음</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="memo blue" style="margin-top:10px;">
+          <strong>CODE:</strong> 팀 규모·운영 부담 → ECS Fargate &nbsp;|&nbsp;
+          <strong>이수:</strong> 멀티 서비스 확장성 + NCP 환경 → Kubernetes
+        </div>
       </div>
     </div>
   </div>

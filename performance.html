@@ -361,6 +361,7 @@
   .section:nth-child(5)  { animation-delay: 0.20s; }
   .section:nth-child(6)  { animation-delay: 0.25s; }
   .section:nth-child(7)  { animation-delay: 0.30s; }
+  .section:nth-child(8)  { animation-delay: 0.35s; }
 
   /* Hamburger Navigation */
   .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
@@ -722,6 +723,95 @@ ORDER BY created_at DESC LIMIT 20;
       <span class="pill">Blameless Postmortem</span>
       <span class="pill">G1GC / ZGC</span>
       <span class="pill">async-profiler</span>
+    </div>
+  </div>
+
+  <!-- 07. 실패 경험 — SCG 마이그레이션 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title">실패 경험 — SCG 마이그레이션</div>
+      <div class="section-tag tag-purple">Shinsegae I&amp;C</div>
+    </div>
+    <div class="card-full c-purple" style="margin-bottom:16px;">
+      <div class="slabel">프로젝트 배경</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.7;">
+        <span class="hl v">스타벅스 On-Premise → 클라우드 점진적 마이그레이션</span> (2022.01 – 2022.05)<br>
+        Spring Cloud Gateway 담당 백엔드 개발자로, Canary 배포를 통한 트래픽 점진 전환을 설계·실행.<br>
+        기술 스택: <span class="hl v">Spring Boot · Spring Cloud Gateway · Spring WebFlux · JPA · Elastic Beanstalk · Redis</span>
+      </p>
+    </div>
+    <div class="grid-2">
+      <div class="card c-pink">
+        <div class="card-title">실패 1 — 성능 테스트 저하</div>
+        <ul class="dot-list pink">
+          <li><strong>증상:</strong> nGrinder 부하 테스트 결과 기존 대비 처리량 현저히 저하</li>
+          <li><strong>원인:</strong> 기존 서비스가 동기 블로킹 방식 → SCG의 Netty 리액티브 런타임과 충돌, 소수 스레드가 점유·대기하며 처리량 급락</li>
+          <li><strong>해결:</strong> <span class="hl p">Mono / Flux</span> 리액티브 체인으로 전면 전환, 논블로킹 I/O 구조 재개발 → 성능 목표치 달성</li>
+          <li><strong>교훈:</strong> 기술 선택 시 해당 기술의 동작 모델(스레드 모델)을 반드시 함께 이해해야 함</li>
+        </ul>
+      </div>
+      <div class="card c-yellow">
+        <div class="card-title">실패 2 — 운영 라우팅 미동작</div>
+        <ul class="dot-list yellow">
+          <li><strong>증상:</strong> 테스트 검증 완료 후 운영 배포 → 트래픽이 신규 Cloud가 아닌 On-Premise로만 라우팅</li>
+          <li><strong>원인 ①:</strong> 환경별 yml 분리 미흡 → 테스트용 Canary weight 값이 운영에 그대로 적용, Cloud weight 미설정</li>
+          <li><strong>원인 ②:</strong> Gateway Predicate 조건이 운영 도메인으로 재설정되지 않아 라우팅 매칭 실패 복합 발생</li>
+          <li><strong>해결:</strong> <span class="hl y">application-prod.yml</span> 환경별 분리, Canary weight 환경변수 외부화, 배포 체크리스트에 라우팅 검증 항목 추가</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-full c-green" style="margin-top:16px;margin-bottom:16px;">
+      <div class="slabel">면접 답변 흐름 — "실패 경험과 극복 방법을 말씀해주세요"</div>
+      <div class="steps" style="margin-top:12px;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>상황 설정</strong> — 신세계아이앤씨에서 스타벅스 On-Premise → 클라우드 마이그레이션 프로젝트의 SCG 담당으로 투입, 크게 두 번의 실패를 겪었습니다.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><strong>실패 1 (성능)</strong> — nGrinder 부하 테스트에서 처리량 급락. 코드 리뷰로 동기 블로킹 코드와 Netty 리액티브 런타임의 충돌 확인 → <span class="hl g">Mono/Flux 리액티브 체인으로 전환</span>해 목표치 달성.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><strong>실패 2 (라우팅)</strong> — 운영 배포 직후 트래픽이 On-Premise로만 흐름. 환경별 yml 미분리 + Predicate 도메인 미설정의 복합 원인 → <span class="hl g">환경별 설정 외부화 + 배포 체크리스트</span> 수립.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><strong>마무리 (전이)</strong> — 이 경험을 CODE ECS Fargate 마이그레이션에 적용, 환경별 설정 분리와 점진적 전환 모니터링 프로세스를 처음부터 갖추어 <strong>다운타임 0 달성</strong>.</div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-table">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-green">꼬리 질문</th>
+            <th class="h-yellow">핵심 답변</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>리액티브 전환 시 어려웠던 점은?</td>
+            <td>팀원들의 WebFlux 경험 부재 → <span class="hl g">Mono/Flux 에러 핸들링 패턴 정리·공유</span>로 러닝커브 단축</td>
+          </tr>
+          <tr>
+            <td>Canary 배포 비율은 어떻게 결정했나?</td>
+            <td>초기 5~10% 시작 → 에러율·응답시간 지표 확인 후 단계적 확대. 롤백 기준(에러율 임계치) 사전 정의</td>
+          </tr>
+          <tr>
+            <td>같은 실수를 다시 하지 않은 방법은?</td>
+            <td>환경별 설정 외부화 + 배포 체크리스트 프로세스화 → CODE에서 동일 방식 적용, 재발 없었음</td>
+          </tr>
+          <tr>
+            <td>Spring WebFlux vs MVC 차이는?</td>
+            <td>MVC: 스레드 per request 블로킹 모델 / WebFlux: 이벤트 루프 논블로킹. I/O 대기 구간에서 WebFlux 효율적, CPU 바운드에서는 이점 없음</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="memo">
+      <strong>핵심 한 줄 요약</strong> — "SCG 동기/비동기 충돌 → 리액티브 전환, 운영 라우팅 실패 → 환경별 설정 외부화. 두 실패가 CODE ECS 마이그레이션 무중단 성공의 기반이 됐다."
     </div>
   </div>
 
