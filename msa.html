@@ -1517,6 +1517,169 @@ allow {
       </div>
     </div>
 
+    <!-- AWS ECS Fargate + ZTA -->
+    <div class="card-full c-yellow" style="margin-bottom:16px;">
+      <div class="slabel">AWS ECS Fargate + ZTA — 서버리스 서비스 메쉬 구축 가이드</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.8; margin-bottom:14px;">
+        Fargate 인프라 위에 서비스 메쉬를 도입하면 <strong style="color:var(--accent3)">서버리스의 편리함</strong>과
+        <strong style="color:var(--accent2)">고도화된 마이크로 네트워크 보안</strong>을 동시에 달성할 수 있다.
+        단, <span class="hl y">AWS App Mesh는 공식 Deprecated</span> — 신규 구축 시 아래 대안 중 하나를 선택해야 한다.
+      </div>
+
+      <!-- 기술 스택 선택 -->
+      <div class="grid-3" style="margin-bottom:16px;">
+        <div class="card c-green" style="margin:0;">
+          <div class="card-title" style="color:var(--accent4);">ECS Service Connect <span style="font-size:11px; background:var(--accent4); color:#000; border-radius:4px; padding:1px 6px; margin-left:6px;">강력 추천</span></div>
+          <ul class="dot-list green">
+            <li>별도 사이드카 설정 없이 <strong>ECS 자체 기능</strong>으로 구현</li>
+            <li>mTLS 암호화 및 트래픽 제어를 <strong>AWS가 네이티브 관리</strong></li>
+            <li>Fargate 환경에서 <strong>운영 오버헤드 최소</strong></li>
+          </ul>
+        </div>
+        <div class="card c-blue" style="margin:0;">
+          <div class="card-title">Amazon VPC Lattice</div>
+          <ul class="dot-list blue">
+            <li>여러 <strong>VPC · AWS 계정</strong>에 걸친 대규모 환경에 적합</li>
+            <li>서비스 간 보안 통신 · 인증을 <strong>중앙 집중식</strong>으로 경량 제어</li>
+            <li>크로스 계정 마이크로서비스 통신에 최적</li>
+          </ul>
+        </div>
+        <div class="card c-purple" style="margin:0;">
+          <div class="card-title">Istio (ztunnel)</div>
+          <ul class="dot-list purple">
+            <li><strong>EKS 크로스 플랫폼</strong> 연동이 필수이거나 미시적 제어가 필요할 때</li>
+            <li>경량 프록시 <span class="hl v">ztunnel</span>을 Fargate Task에 사이드카로 탑재</li>
+            <li>App Mesh 대비 커뮤니티 지원·생태계 풍부</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 핵심 구현 요건 -->
+      <div class="grid-2">
+        <div>
+          <div class="slabel" style="margin-bottom:8px;">① 네트워크 세그멘테이션 · 네이티브 mTLS</div>
+          <ul class="dot-list yellow">
+            <li>
+              <span class="hl y">awsvpc 네트워크 모드</span> — Fargate는 이 모드만 지원.
+              모든 Task가 <strong>고유 프라이빗 IP</strong>를 가짐
+            </li>
+            <li>
+              <span class="hl y">East-West mTLS 강제</span> — 서비스 메쉬로 컨테이너 간 모든 통신에 mTLS 활성화.
+              컨테이너 A·B가 서로의 <strong>인증서(Identity)를 상호 검증</strong>
+            </li>
+            <li>
+              <span class="hl y">Task 레벨 Security Group 최소화</span> — 서비스 메쉬 프록시 포트만 인바운드 허용.
+              나머지 포트 <strong>원천 차단</strong>
+            </li>
+          </ul>
+
+          <div class="slabel" style="margin-bottom:8px; margin-top:14px;">② 아이덴티티 분리 · 최소 권한</div>
+          <ul class="dot-list yellow">
+            <li>
+              <span class="hl y">Task Execution Role</span> — Fargate 인프라용.
+              ECR 이미지 Pull · CloudWatch 로그 전송에만 사용
+            </li>
+            <li>
+              <span class="hl y">Task Role</span> — 앱 컨테이너 코드용.
+              S3 · DynamoDB 등 AWS 리소스 접근 권한을 <strong>최소 단위로 분리</strong>
+            </li>
+            <li>
+              <span class="hl y">서비스 메쉬 Discovery 권한</span> — AWS Cloud Map 등 메쉬 구동 권한도 개별 Task Role에 <strong>최소 부여</strong>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="slabel" style="margin-bottom:8px;">③ Fargate 런타임 위협 방어</div>
+          <ul class="dot-list yellow">
+            <li>
+              <span class="hl y">readonlyRootFilesystem: true</span> — Task Definition에서 컨테이너 루트 파일시스템을 읽기 전용으로 설정하여
+              <strong>이미지 변조 차단</strong>. 쓰기 필요 경로는 <code>ephemeralStorage</code> 볼륨으로 분리
+            </li>
+            <li>
+              <span class="hl y">Amazon Inspector 자동 스캔</span> — ECR 이미지 Push 시 취약점 자동 스캔 활성화.
+              <strong>공급망 보안(Supply Chain Security)</strong> 확보
+            </li>
+          </ul>
+
+          <div class="memo" style="margin-top:14px;">
+            <strong>Task Role 분리가 ZTA의 핵심:</strong><br>
+            Execution Role(인프라 권한)과 Task Role(앱 권한)을 반드시 분리해야 한다.
+            하나의 Role에 합치면 앱 컨테이너가 침해당했을 때 인프라 전체 권한까지 탈취된다.
+          </div>
+
+          <div class="code-block" style="margin-top:12px; font-size:12px;">
+<span class="cm"># Task Definition — ZTA 필수 설정 예시</span>
+<span class="str">"containerDefinitions"</span>: [{
+  <span class="str">"readonlyRootFilesystem"</span>: <span class="val">true</span>,
+  <span class="str">"user"</span>: <span class="str">"1000:1000"</span>,  <span class="cm"># non-root 실행</span>
+  <span class="str">"linuxParameters"</span>: {
+    <span class="str">"capabilities"</span>: { <span class="str">"drop"</span>: [<span class="str">"ALL"</span>] }
+  }
+}]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZTA 기술 면접 핵심 질문 -->
+    <div class="card-full c-purple" style="margin-bottom:16px;">
+      <div class="slabel">ZTA 기술 면접 핵심 질문</div>
+
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-q-num">Q</span>Zero Trust Architecture란 무엇이고, 전통적인 경계 보안과 어떻게 다른가요?</div>
+        <div class="qa-a">
+          <span class="em">ZTA(Zero Trust Architecture)</span>는 "절대 신뢰하지 말고, 항상 검증하라(Never Trust, Always Verify)"는 원칙 아래 내부·외부 구분 없이 모든 요청을 검증하는 보안 모델입니다.<br><br>
+          <span class="key">전통 경계 보안</span> — 방화벽 안쪽 트래픽은 신뢰. VPN으로 내부 진입 후 이동 제한 없음. 내부 공격자(Insider Threat)나 측면 이동(Lateral Movement)에 취약합니다.<br>
+          <span class="key">ZTA</span> — 내부 트래픽도 모두 검증. 최소 권한(Least Privilege) 적용. 모든 통신을 mTLS로 암호화. 침해를 전제(Assume Breach)로 설계합니다.<br><br>
+          MSA에서 서비스 수가 늘어날수록 내부 트래픽 공격 표면이 넓어지므로, ZTA는 선택이 아닌 <span class="em">필수 설계 원칙</span>이 됩니다.
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-q-num">Q</span>Istio의 mTLS 동작 원리를 설명해주세요. 애플리케이션 코드 변경 없이 어떻게 암호화가 적용되나요?</div>
+        <div class="qa-a">
+          Istio는 <span class="em">사이드카(Sidecar) 패턴</span>으로 동작합니다. Pod 내부에 Envoy 프록시 컨테이너를 자동 주입하고, iptables 규칙으로 모든 트래픽을 Envoy가 가로채도록 합니다.<br><br>
+          <span class="key">발신(Pod A)</span> — 앱 컨테이너가 평범한 HTTP 요청 → Pod A의 Envoy 프록시가 가로채어 mTLS 암호화 후 전송<br>
+          <span class="key">수신(Pod B)</span> — Pod B의 Envoy 프록시가 암호화 트래픽을 복호화 → 앱 컨테이너에 평범한 HTTP로 전달<br><br>
+          결과적으로 앱 컨테이너는 <span class="em">암호화가 일어나는지도 모른 채</span> 일반 HTTP 통신을 주고받게 됩니다.
+          인증서 발급·갱신은 Istio의 컨트롤 플레인(istiod)이 자동 처리하며, SPIFFE/SPIRE와 연동하면 서비스 신원(SVID)까지 표준화할 수 있습니다.
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-q-num">Q</span>AWS Fargate 환경에서 ZTA를 구현할 때 App Mesh 대신 무엇을 써야 하나요? 이유는?</div>
+        <div class="qa-a">
+          <span class="em">AWS App Mesh는 공식 Deprecated</span>되었습니다. 신규 구축 시에는 목적에 따라 다음 중 선택합니다.<br><br>
+          <span class="key">ECS Service Connect</span> — 단일 클러스터·계정 내 Fargate 서비스 메쉬의 기본 선택. 사이드카 설정 없이 ECS 자체 기능으로 mTLS와 트래픽 제어를 완전 관리형으로 제공합니다.<br>
+          <span class="key">Amazon VPC Lattice</span> — 여러 VPC·계정에 걸친 대규모 환경에서 중앙 집중식 서비스 간 보안 통신이 필요할 때 선택합니다.<br>
+          <span class="key">Istio (ztunnel)</span> — EKS 크로스 플랫폼 연동이 필수이거나 세밀한 트래픽 정책 제어가 필요할 때, ztunnel을 사이드카로 Task에 탑재합니다.<br><br>
+          대부분의 Fargate 신규 프로젝트는 <span class="em">ECS Service Connect가 최적</span>입니다.
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-q-num">Q</span>ECS Task에서 Task Execution Role과 Task Role을 반드시 분리해야 하는 이유는?</div>
+        <div class="qa-a">
+          두 Role은 <span class="em">사용 주체가 다릅니다.</span><br><br>
+          <span class="key">Task Execution Role</span> — <strong>Fargate 인프라(AWS 제어 플레인)</strong>가 사용. ECR 이미지 Pull, CloudWatch 로그 전송 등 컨테이너 기동에 필요한 권한.<br>
+          <span class="key">Task Role</span> — <strong>컨테이너 내부의 애플리케이션 코드</strong>가 사용. S3·DynamoDB 등 비즈니스 로직에 필요한 AWS 리소스 접근 권한.<br><br>
+          두 Role을 합치면 앱 컨테이너가 침해(Compromise)당했을 때 <span class="em">인프라 제어 권한까지 탈취</span>됩니다.
+          ZTA의 최소 권한 원칙에 따라 반드시 분리하고, 각 Role에는 해당 주체에 필요한 최소한의 권한만 부여해야 합니다.
+        </div>
+      </div>
+
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-q-num">Q</span>OPA(Open Policy Agent)가 ZTA에서 어떤 역할을 하나요?</div>
+        <div class="qa-a">
+          OPA는 <span class="em">정책(Policy)을 코드(Code)로 관리</span>하는 범용 정책 엔진입니다. ZTA에서는 인증(Authentication) 이후의 <strong>인가(Authorization) 판단</strong>을 담당합니다.<br><br>
+          <span class="key">동작 방식</span> — API Gateway 또는 Service Mesh에서 요청이 들어오면 OPA에 질의. OPA는 Rego 언어로 작성된 정책을 평가하여 허용/거부를 반환합니다.<br>
+          <span class="key">활용 예시</span> — "order-service는 payment-service의 POST /api/v1/payments 엔드포인트만 호출 가능", "ROLE_ADMIN만 /admin/ 경로 접근 허용"<br><br>
+          정책을 코드로 관리하므로 <span class="em">버전 관리·테스트·감사(Audit)</span>가 가능하고, 인가 로직을 애플리케이션 코드에서 분리하여 중앙 집중화할 수 있습니다.
+        </div>
+      </div>
+    </div>
+
     <div class="memo pink">
       <strong>ZTA 도입 주의사항:</strong> Zero Trust는 한 번에 구축하는 것이 아니라 <strong>성숙도 단계별로 점진적으로 도입</strong>한다.
       1단계(신원 검증 강화) → 2단계(디바이스 신뢰 구축) → 3단계(네트워크 세그먼트) → 4단계(앱 워크로드 격리) → 5단계(데이터 중심 보안).
