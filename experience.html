@@ -1248,6 +1248,149 @@
         </div>
       </div>
     </div>
+
+    <!-- ── 전환 프로세스 상세 ── -->
+    <div style="margin-top:24px;">
+      <div class="card-title" style="font-size:13px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--border);">클라우드 전환 프로세스 (Discovery → Roadmap)</div>
+
+      <!-- 1. Discovery -->
+      <div class="card c-blue" style="margin-bottom:12px;">
+        <div class="card-title">1. Discovery <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:400;">현황 조사</span></div>
+        <div class="grid-2" style="margin-top:10px;gap:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px;">수집 항목</div>
+            <ul class="dot-list blue">
+              <li>서버 수량 및 스펙</li>
+              <li>OS 버전 / DB 종류 및 버전</li>
+              <li>WAS, 웹서버 구성</li>
+              <li>네트워크 구성 / 스토리지 사용량</li>
+              <li>시스템 간 연계 현황</li>
+              <li>운영/배포 방식</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px;">산출물</div>
+            <ul class="dot-list blue">
+              <li>As-Is 아키텍처</li>
+              <li>서버 인벤토리</li>
+              <li>애플리케이션 목록</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Assessment -->
+      <div class="card c-orange" style="margin-bottom:12px;">
+        <div class="card-title">2. Assessment <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:400;">전환 분석</span></div>
+        <div class="grid-2" style="margin-top:10px;gap:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">평가 항목</div>
+            <ul class="dot-list orange">
+              <li><strong>애플리케이션</strong> — 클라우드 이전 가능 여부 · OS 종속성 · 라이선스 · 컨테이너 전환 가능성</li>
+              <li><strong>데이터베이스</strong> — RDS 전환 가능 여부 · 버전 호환성 · 다운타임 요구사항 · 데이터 이관 방식</li>
+              <li><strong>인프라</strong> — EC2 Lift &amp; Shift 가능 여부 · Auto Scaling · Managed Service 활용</li>
+              <li><strong>보안/네트워크</strong> — VPC 설계 · VPN/Direct Connect 필요 여부 · IAM 체계</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">산출물 및 서비스 매핑 예시</div>
+            <ul class="dot-list orange">
+              <li>워크로드별 난이도 / 리스크 분석</li>
+              <li>AWS 서비스 매핑</li>
+            </ul>
+            <table class="when-table" style="margin-top:8px;font-size:10px;">
+              <thead><tr><th>현재 환경</th><th>AWS 전환</th></tr></thead>
+              <tbody>
+                <tr><td>VMware VM</td><td>EC2</td></tr>
+                <tr><td>Oracle DB</td><td>RDS Oracle</td></tr>
+                <tr><td>NAS</td><td>EFS</td></tr>
+                <tr><td>Jenkins</td><td>CodePipeline</td></tr>
+                <tr><td>Nginx LB</td><td>ALB</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Migration Strategy -->
+      <div class="card c-purple" style="margin-bottom:12px;">
+        <div class="card-title">3. Migration Strategy 수립 <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:400;">AWS 7R 기준 분류</span></div>
+        <div class="grid-2" style="margin-top:10px;gap:10px;">
+          <div>
+            <table class="when-table" style="font-size:10px;">
+              <thead><tr><th>전략</th><th>의미</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Rehost</strong></td><td>그대로 이전 (Lift &amp; Shift)</td></tr>
+                <tr><td><strong>Replatform</strong></td><td>일부 개선 후 이전</td></tr>
+                <tr><td><strong>Refactor</strong></td><td>클라우드 네이티브로 재설계</td></tr>
+                <tr><td><strong>Repurchase</strong></td><td>SaaS로 대체</td></tr>
+                <tr><td><strong>Relocate</strong></td><td>VMware 통째 이동</td></tr>
+                <tr><td><strong>Retain</strong></td><td>유지</td></tr>
+                <tr><td><strong>Retire</strong></td><td>폐기</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:6px;">적용 예시</div>
+            <ul class="dot-list purple">
+              <li>Java Spring 서비스 → <strong>Replatform</strong></li>
+              <li>Oracle → RDS Oracle → <strong>Replatform</strong></li>
+              <li>레거시 C 프로그램 → <strong>Rehost</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 비용 분석 -->
+      <div class="card c-yellow" style="margin-bottom:12px;">
+        <div class="card-title">4. 비용 분석 <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:400;">온프레미스 vs AWS TCO 비교</span></div>
+        <div class="grid-2" style="margin-top:10px;gap:10px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--yellow);margin-bottom:6px;">평가 항목</div>
+            <ul class="dot-list yellow">
+              <li>EC2 / RDS / EBS / S3</li>
+              <li>데이터 전송 비용</li>
+              <li>백업 / 모니터링</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--yellow);margin-bottom:6px;">산출물</div>
+            <ul class="dot-list yellow">
+              <li>TCO (Total Cost of Ownership)</li>
+              <li>3년 / 5년 비용 비교</li>
+              <li>예상 절감 효과</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Migration Roadmap -->
+      <div class="card c-green" style="margin-bottom:12px;">
+        <div class="card-title">5. Migration Roadmap <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:400;">우선순위 기반 이행 계획</span></div>
+        <table class="when-table" style="margin-top:10px;font-size:10px;">
+          <thead><tr><th>Phase</th><th>대상</th></tr></thead>
+          <tbody>
+            <tr><td>1차</td><td>개발/테스트 환경</td></tr>
+            <tr><td>2차</td><td>내부 업무 시스템</td></tr>
+            <tr><td>3차</td><td>고객 서비스</td></tr>
+            <tr><td>4차</td><td>핵심 업무 시스템</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 최종 산출물 -->
+      <div class="memo" style="margin-bottom:0;">
+        <strong>최종 산출물:</strong>
+        <span class="badge b" style="margin-left:6px;">As-Is 아키텍처</span>
+        <span class="badge b">AWS To-Be 아키텍처</span>
+        <span class="badge g">서버·앱 인벤토리</span>
+        <span class="badge p">7R 분석 결과</span>
+        <span class="badge y">Migration Wave Plan</span>
+        <span class="badge p">리스크 분석서</span>
+        <span class="badge y">AWS 비용 산정서</span>
+        <span class="badge g">전환 로드맵</span>
+      </div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════
