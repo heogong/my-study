@@ -362,6 +362,7 @@
   .section:nth-child(6)  { animation-delay: 0.25s; }
   .section:nth-child(7)  { animation-delay: 0.30s; }
   .section:nth-child(8)  { animation-delay: 0.35s; }
+  .section:nth-child(9)  { animation-delay: 0.40s; }
 
   /* Hamburger Navigation */
   .hamburger-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 44px; height: 44px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s ease; }
@@ -726,10 +727,98 @@ ORDER BY created_at DESC LIMIT 20;
     </div>
   </div>
 
-  <!-- 07. 실패 경험 — SCG 마이그레이션 -->
+  <!-- 07. 실패 경험 — Kubernetes 도입 실패 -->
   <div class="section">
     <div class="section-header">
       <div class="section-num">07</div>
+      <div class="section-title">실패 경험 — Kubernetes 도입 실패</div>
+      <div class="section-tag tag-blue">NCP · K8s</div>
+    </div>
+    <div class="card-full c-blue" style="margin-bottom:16px;">
+      <div class="slabel">프로젝트 배경</div>
+      <p style="font-size:13px;color:var(--text);line-height:1.7;">
+        <span class="hl b">이전 회사 AWS ECS 운영 경험 → 새 회사 NCP 환경에 Kubernetes 직접 구축</span><br>
+        ECS를 통한 배포 자동화·운영 효율화 성공 경험을 바탕으로, 새 회사 NCP 가상 서버 위에 Kubernetes 클러스터를 직접 구성.<br>
+        기술 스택: <span class="hl b">NCP · Kubernetes · Docker · Ingress · 자체 모니터링/로깅 구성</span>
+      </p>
+    </div>
+    <div class="grid-2">
+      <div class="card c-pink">
+        <div class="card-title">실패 원인 — 기술 선택 편향</div>
+        <ul class="dot-list pink">
+          <li><strong>전제 오류:</strong> "이전 회사에서 성공한 기술 = 현재 회사에서도 최선"이라는 편향</li>
+          <li><strong>환경 차이 간과:</strong> AWS ECS는 Managed 서비스 — NCP 위 자체 K8s는 클러스터·네트워크·Ingress·인증서·모니터링·로깅·백업 전부 직접 구성 필요</li>
+          <li><strong>조직 역량 미고려:</strong> 운영 인력의 Kubernetes 숙련도 부족 → 운영 복잡도 급증, 장애 대응 부담 증가</li>
+        </ul>
+      </div>
+      <div class="card c-green">
+        <div class="card-title">회고 — 다시 선택한다면</div>
+        <ul class="dot-list">
+          <li>기술 도입 전 <span class="hl g">PoC 수행</span> → 운영팀과 함께 운영 비용·복잡도 공동 평가</li>
+          <li>Kubernetes가 정말 필요한 수준인지 <span class="hl g">요구사항 기반 재검토</span></li>
+          <li>조직 규모·운영 역량·클라우드 환경·인력 수준을 기술 선택 기준에 포함</li>
+          <li>대안 검토: Docker Compose, Managed K8s 서비스, 더 단순한 운영 방식도 선택지로 고려</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-full c-yellow" style="margin-top:16px;margin-bottom:16px;">
+      <div class="slabel">면접 답변 흐름 — "기술 선택 실패 경험"</div>
+      <div class="steps" style="margin-top:12px;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>상황 설정</strong> — 이전 회사에서 AWS ECS로 컨테이너 서비스 운영 성공 경험이 있어, 새 회사 NCP 환경에서도 컨테이너 오케스트레이션이 당연히 좋은 선택이라 판단했습니다.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><strong>문제 발생</strong> — 기술적으로는 K8s 클러스터 구축에 성공했지만, Managed 서비스인 ECS와 달리 클러스터·네트워크·Ingress·인증서·모니터링 등을 <strong>모두 직접 구성</strong>해야 했고, 운영 인력의 숙련도 부족으로 장애 대응 부담이 급증했습니다.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><strong>깨달음</strong> — <span class="hl y">기술의 우수성</span>뿐 아니라 <span class="hl y">조직의 규모, 운영 역량, 클라우드 환경, 인력 수준</span>까지 함께 고려해야 한다는 것을 깨달았습니다. "이전에 성공했다"는 이유만으로 기술을 선택하면 안 됩니다.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body"><strong>개선 방향</strong> — 이후에는 기술 도입 전 PoC를 수행하고 운영팀과 운영 비용·복잡도를 함께 평가하는 프로세스를 갖추었습니다. 경우에 따라 Managed 서비스나 더 단순한 방식도 적극 고려합니다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-table">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="h-green">꼬리 질문</th>
+            <th class="h-yellow">핵심 답변</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>왜 Managed K8s 서비스는 검토 안 했나?</td>
+            <td>NCP Managed K8s가 당시 기능 제약이 있어 직접 구축을 선택했으나, 운영 복잡도 비용을 과소평가한 판단 실수였습니다</td>
+          </tr>
+          <tr>
+            <td>결국 어떻게 해결했나?</td>
+            <td>운영 역량에 맞게 단계적으로 모니터링·로깅 자동화를 추가하고, 팀 내 K8s 교육을 병행해 점진적으로 운영 부담을 낮췄습니다</td>
+          </tr>
+          <tr>
+            <td>AWS ECS vs Kubernetes 비교하면?</td>
+            <td>ECS: AWS 종속이지만 Managed로 운영 부담 낮음 / K8s: 이식성·생태계 풍부하지만 자체 운영 시 복잡도 높음. 팀 역량에 따라 선택이 달라집니다</td>
+          </tr>
+          <tr>
+            <td>기술 선택 기준을 어떻게 바꿨나?</td>
+            <td>기술 성숙도·생태계뿐 아니라 팀 역량·운영 비용·조직 규모를 체크리스트화해 의사결정 시 함께 검토합니다</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="memo">
+      <strong>핵심 한 줄 요약</strong> — "기술의 우수성과 조직의 운영 역량은 별개다. 성공 경험이 있는 기술도 새 환경에선 PoC와 조직 역량 평가를 먼저 해야 한다."
+    </div>
+  </div>
+
+  <!-- 08. 실패 경험 — SCG 마이그레이션 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">08</div>
       <div class="section-title">실패 경험 — SCG 마이그레이션</div>
       <div class="section-tag tag-purple">Shinsegae I&amp;C</div>
     </div>
